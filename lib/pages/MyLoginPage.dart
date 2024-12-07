@@ -15,7 +15,7 @@ class MyLoginPage extends StatelessWidget {
       body: Center(
           child: Container(
         width: width > 600 ? 550 : width,
-        height: width > 600 ? 400 : height,
+        height: width > 600 ? 500 : height,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.black,

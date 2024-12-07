@@ -34214,7 +34214,7 @@ A.pa.prototype={
 N(a){var s,r,q,p,o,n,m,l,k,j,i,h=null,g=4289644278,f=t.w,e=A.bD(a,h,f).w.a.a,d=A.bD(a,h,f).w.a.b
 f=e>600
 s=f?550:e
-f=f?400:d
+f=f?500:d
 r=A.ir(30)
 q=A.auR(h,h,new A.pc("https://lh3.googleusercontent.com/COxitqgJr1sJnIDe8-jiKhxDx1FrYbtRHKJ9z_hELisAlapwE9LUPh6fcXIfb5vwpbMl4xl9H9TRFPc5NOO8Sb3VSgIBrfRYvW6cUA",1,h))
 p=A.bR("Sign in",h,h,h,A.c4().$3$color$fontSize$fontWeight(B.j,24,B.ba),h,h)
