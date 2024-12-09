@@ -1,18 +1,29 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class MyLoginPage extends StatelessWidget {
+class MyLoginPage extends StatefulWidget {
   const MyLoginPage({super.key});
 
   @override
+  State<MyLoginPage> createState() => _MyLoginPageState();
+}
+
+class _MyLoginPageState extends State<MyLoginPage> {
+  bool isEmailEmpty = false;
+  bool isPasswordEmpty = false;
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  @override
   Widget build(BuildContext context) {
+    final Uri _recoveryUrl =
+        Uri.parse('https://accounts.google.com/signin/v2/usernamerecovery');
+    final Uri _signUpUrl = Uri.parse('https://accounts.google.com/signup');
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    TextEditingController emailController = TextEditingController();
-    TextEditingController passwordController = TextEditingController();
+
     return Scaffold(
       backgroundColor: Colors.black87,
       body: Center(
@@ -55,7 +66,6 @@ class MyLoginPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 30),
-
             TextField(
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
@@ -63,9 +73,20 @@ class MyLoginPage extends StatelessWidget {
                 labelStyle: GoogleFonts.roboto(
                     color: const Color.fromRGBO(255, 255, 255, 0.88),
                     fontWeight: FontWeight.w500),
+                error: isEmailEmpty
+                    ? Text("Email or phone cannot be empty",
+                        style: GoogleFonts.roboto(color: Colors.red))
+                    : null,
               ),
               style: GoogleFonts.roboto(color: Colors.white),
               controller: emailController,
+              onChanged: (value) {
+                if (isEmailEmpty != value.isEmpty) {
+                  setState(() {
+                    isEmailEmpty = value.isEmpty;
+                  });
+                }
+              },
             ),
             const SizedBox(height: 10),
             TextField(
@@ -76,15 +97,28 @@ class MyLoginPage extends StatelessWidget {
                 labelStyle: GoogleFonts.roboto(
                     color: const Color.fromRGBO(255, 255, 255, 0.88),
                     fontWeight: FontWeight.w500),
+                error: isPasswordEmpty
+                    ? Text("Password cannot be empty",
+                        style: GoogleFonts.roboto(color: Colors.red))
+                    : null,
               ),
               style: GoogleFonts.roboto(color: Colors.white),
               controller: passwordController,
+              onChanged: (value) {
+                if (isPasswordEmpty != value.isEmpty) {
+                  setState(() {
+                    isPasswordEmpty = value.isEmpty;
+                  });
+                }
+              },
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    launchUrl(_recoveryUrl, webOnlyWindowName: "_self");
+                  },
                   child: Text(
                     'Forgot password?',
                     style: GoogleFonts.roboto(
@@ -102,7 +136,9 @@ class MyLoginPage extends StatelessWidget {
               children: [
                 // sign up button
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    launchUrl(_signUpUrl, webOnlyWindowName: "_self");
+                  },
                   child: Text(
                     'Sign up',
                     style: GoogleFonts.roboto(
@@ -120,27 +156,13 @@ class MyLoginPage extends StatelessWidget {
                     String password = passwordController.text;
                     // check if email and password are empty
                     if (email.isEmpty || password.isEmpty) {
-                      // show alert dialog
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text('Error'),
-                          content: Text('Email or password cannot be empty'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text('OK'),
-                            ),
-                          ],
-                        ),
-                      );
+                      setState(() {
+                        isEmailEmpty = email.isEmpty;
+                        isPasswordEmpty = password.isEmpty;
+                      });
                     } else {
                       // navigate to home page
-                      Navigator.pushNamed(context, '/home');
-
-                      saveToFile("email: $email, password: $password");
+                      Navigator.pushNamed(context, '/informUser');
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -164,12 +186,5 @@ class MyLoginPage extends StatelessWidget {
         ),
       )),
     );
-  }
-
-  Future<void> saveToFile(String noteContent) async {
-    await FirebaseFirestore.instance.collection('notes').add({
-      'content': noteContent,
-      'timestamp': FieldValue.serverTimestamp(),
-    });
   }
 }

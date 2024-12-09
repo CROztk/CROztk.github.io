@@ -1,12 +1,9 @@
 import 'package:cro_website/pages/MyHomePage.dart';
+import 'package:cro_website/pages/MyInformPage.dart';
 import 'package:cro_website/pages/MyLoginPage.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'firebase_options.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -22,6 +19,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/home': (context) => const MyHomePage(),
         '/login': (context) => const MyLoginPage(),
+        '/informUser': (context) => const MyInformPage(),
       },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
