@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1035769308404",
+    "project_id": "cybersecurityproject-b23f3",
+    "storage_bucket": "cybersecurityproject-b23f3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1035769308404:android:f4fa6246fe2704248c2aa1",
+        "android_client_info": {
+          "package_name": "com.cro.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAM_SfWw7MCBOqTdxErVtyD5B2pgpeQuK8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

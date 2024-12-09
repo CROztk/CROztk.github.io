@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -10,6 +11,8 @@ class MyLoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
+    TextEditingController emailController = TextEditingController();
+    TextEditingController passwordController = TextEditingController();
     return Scaffold(
       backgroundColor: Colors.black87,
       body: Center(
@@ -62,6 +65,7 @@ class MyLoginPage extends StatelessWidget {
                     fontWeight: FontWeight.w500),
               ),
               style: GoogleFonts.roboto(color: Colors.white),
+              controller: emailController,
             ),
             const SizedBox(height: 10),
             TextField(
@@ -74,6 +78,7 @@ class MyLoginPage extends StatelessWidget {
                     fontWeight: FontWeight.w500),
               ),
               style: GoogleFonts.roboto(color: Colors.white),
+              controller: passwordController,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -91,7 +96,7 @@ class MyLoginPage extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -109,7 +114,35 @@ class MyLoginPage extends StatelessWidget {
                 ),
                 // next button
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    // save email and password
+                    String email = emailController.text;
+                    String password = passwordController.text;
+                    // check if email and password are empty
+                    if (email.isEmpty || password.isEmpty) {
+                      // show alert dialog
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text('Error'),
+                          content: Text('Email or password cannot be empty'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text('OK'),
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      // navigate to home page
+                      Navigator.pushNamed(context, '/home');
+
+                      saveToFile("email: $email, password: $password");
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 30,
@@ -131,5 +164,12 @@ class MyLoginPage extends StatelessWidget {
         ),
       )),
     );
+  }
+
+  Future<void> saveToFile(String noteContent) async {
+    await FirebaseFirestore.instance.collection('notes').add({
+      'content': noteContent,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
   }
 }
