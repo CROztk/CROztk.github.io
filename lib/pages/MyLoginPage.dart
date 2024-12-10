@@ -30,10 +30,10 @@ class _MyLoginPageState extends State<MyLoginPage> {
           child: Container(
         width: width > 600 ? 550 : width,
         height: width > 600 ? 500 : height,
-        padding: EdgeInsets.all(width > 600 ? 20 : 0),
+        padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.black,
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(width > 600 ? 30 : 0),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
