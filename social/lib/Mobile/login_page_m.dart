@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social/components/my_appbar.dart';
+import 'package:social/components/my_elevated_button.dart';
 import 'package:social/components/my_textfield.dart';
 
 class MyLoginPageMobile extends StatefulWidget {
@@ -10,6 +11,8 @@ class MyLoginPageMobile extends StatefulWidget {
 }
 
 class _MyLoginPageMobileState extends State<MyLoginPageMobile> {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,12 +27,14 @@ class _MyLoginPageMobileState extends State<MyLoginPageMobile> {
               MyTextfield(
                   text: "Username",
                   obscureText: false,
-                  controller: TextEditingController()),
+                  controller: _usernameController),
               SizedBox(height: 10),
               MyTextfield(
                   text: "Password",
                   obscureText: true,
-                  controller: TextEditingController()),
+                  controller: _passwordController),
+              SizedBox(height: 10),
+              MyElevatedButton(text: "Login", onPressed: () {}),
             ],
           ),
         ),
