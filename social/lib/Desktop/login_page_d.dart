@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:social/components/my_appbar.dart';
 import 'package:social/components/my_textfield.dart';
+import 'package:social/components/my_elevated_button.dart';
 
 class MyLoginPageDesktop extends StatelessWidget {
   const MyLoginPageDesktop({super.key});
@@ -30,6 +31,15 @@ class MyLoginPageDesktop extends StatelessWidget {
                     text: "Password",
                     obscureText: true,
                     controller: TextEditingController()),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                height: 50,
+                width: 200,
+                child: MyElevatedButton(
+                  text: "Login",
+                  onPressed: () {},
+                ),
               ),
             ],
           ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social/components/my_appbar.dart';
+import 'package:social/components/my_elevated_button.dart';
 import 'package:social/components/my_textfield.dart';
 
 class MyLoginPageTablet extends StatelessWidget {
@@ -19,17 +20,32 @@ class MyLoginPageTablet extends StatelessWidget {
               SizedBox(
                 width: 630,
                 child: MyTextfield(
-                    text: "Username",
-                    obscureText: false,
-                    controller: TextEditingController()),
+                  text: "Username",
+                  obscureText: false,
+                  controller: TextEditingController(),
+                ),
               ),
               const SizedBox(height: 10),
               SizedBox(
                 width: 630,
-                child: MyTextfield(
-                    text: "Password",
-                    obscureText: true,
-                    controller: TextEditingController()),
+                child: Column(
+                  children: [
+                    MyTextfield(
+                      text: "Password",
+                      obscureText: true,
+                      controller: TextEditingController(),
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      height: 50,
+                      width: 100,
+                      child: MyElevatedButton(
+                        text: "Login",
+                        onPressed: () {},
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
