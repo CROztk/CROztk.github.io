@@ -1,9 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:social/Responsive/responsive_layout.dart';
 import 'package:social/Theme/theme_modes.dart';
 import 'package:social/Theme/theme_notifier.dart';
+import 'package:social/auth/auth.dart';
 import 'package:social/firebase_options.dart';
 
 void main() async {
@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           theme: lightTheme,
           darkTheme: darkTheme,
-          home: const ResponsiveLayout(),
+          home: const AuthPage(),
           themeMode: themeNotifier.themeMode,
         );
       },
