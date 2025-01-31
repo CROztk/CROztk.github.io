@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:social/components/my_appbar.dart';
+import 'package:social/components/my_textfield.dart';
 
 class MyLoginPageTablet extends StatelessWidget {
   const MyLoginPageTablet({super.key});
@@ -6,12 +8,32 @@ class MyLoginPageTablet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("s o C I a l"),
-        elevation: 1,
-      ),
-      body: const Center(
-        child: Text('This is the Tablet login page'),
+      appBar: MyAppbar(title: "s o C I a l"),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('This is the Tablet login page'),
+              SizedBox(
+                width: 630,
+                child: MyTextfield(
+                    text: "Username",
+                    obscureText: false,
+                    controller: TextEditingController()),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: 630,
+                child: MyTextfield(
+                    text: "Password",
+                    obscureText: true,
+                    controller: TextEditingController()),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
