@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:social/pages/login_page.dart';
-import 'package:social/theme_modes.dart';
+import 'package:provider/provider.dart';
+import 'package:social/Responsive/responsive_layout.dart';
+import 'package:social/Theme/theme_modes.dart';
+import 'package:social/Theme/theme_notifier.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+    create: (context) => ThemeNotifier(),
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -12,11 +17,17 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false,
-      theme: darkTheme,
-      home: const MyLoginPage(),
+    return Consumer<ThemeNotifier>(
+      builder: (context, themeNotifier, child) {
+        return MaterialApp(
+          title: 's o C I a l',
+          debugShowCheckedModeBanner: false,
+          theme: lightTheme,
+          darkTheme: darkTheme,
+          home: const ResponsiveLayout(),
+          themeMode: themeNotifier.themeMode,
+        );
+      },
     );
   }
 }
