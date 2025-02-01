@@ -15,10 +15,10 @@ class MyDrawer extends StatelessWidget {
             ),
             child: Column(
               children: [
-                const Icon(
+                Icon(
                   Icons.account_circle,
                   size: 100,
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
                 Text(FirebaseAuth.instance.currentUser?.email ?? ''),
               ],
@@ -26,6 +26,8 @@ class MyDrawer extends StatelessWidget {
           ),
           ListTile(
             title: const Text('Logout'),
+            leading: Icon(Icons.logout,
+                color: Theme.of(context).colorScheme.onSurface),
             onTap: () {
               Navigator.pop(context);
               FirebaseAuth.instance.signOut();
