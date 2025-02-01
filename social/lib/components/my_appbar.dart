@@ -3,9 +3,10 @@ import 'package:social/Theme/theme_notifier.dart';
 import 'package:provider/provider.dart';
 
 class MyAppbar extends StatelessWidget implements PreferredSizeWidget {
-  const MyAppbar({super.key, required this.title});
+  const MyAppbar({super.key, required this.title, this.leading});
 
   final String title;
+  final Widget? leading;
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +22,7 @@ class MyAppbar extends StatelessWidget implements PreferredSizeWidget {
           },
         ),
       ],
+      leading: leading,
     );
   }
 

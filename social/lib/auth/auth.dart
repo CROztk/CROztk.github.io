@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:social/Responsive/responsive_layout.dart';
+import 'package:social/Responsive/responsive_layout_loginout.dart';
+import 'package:social/Responsive/responsive_layout_mainmenu.dart';
 
 class AuthPage extends StatelessWidget {
   const AuthPage({super.key});
@@ -11,24 +12,9 @@ class AuthPage extends StatelessWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('You are logged in'),
-                  ElevatedButton(
-                    onPressed: () {
-                      FirebaseAuth.instance.signOut();
-                    },
-                    child: const Text('Logout'),
-                  ),
-                ],
-              ),
-            ),
-          );
+          return ResponsiveLayoutMainmenu();
         } else {
-          return const ResponsiveLayout();
+          return ResponsiveLayoutLoginout();
         }
       },
     );

@@ -3,21 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:social/components/my_appbar.dart';
 import 'package:social/components/my_elevated_button.dart';
 import 'package:social/components/my_textfield.dart';
+import 'package:social/helper_functions.dart';
 
 class MyLoginPageMobile extends StatefulWidget {
-  const MyLoginPageMobile({super.key});
+  final void Function()? onTap;
+  const MyLoginPageMobile({super.key, required this.onTap});
 
   @override
   State<MyLoginPageMobile> createState() => _MyLoginPageMobileState();
 }
 
 class _MyLoginPageMobileState extends State<MyLoginPageMobile> {
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   // login method
-  void _login() {
-    final String username = _usernameController.text;
+  void _login() async {
+    final String username = _emailController.text;
     final String password = _passwordController.text;
 
     // show dialog circle
@@ -29,17 +31,8 @@ class _MyLoginPageMobileState extends State<MyLoginPageMobile> {
         );
       },
     );
-
-    // try sign in
-    try {
-      FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: username,
-        password: password,
-      );
-
-      // close dialog
-      Navigator.of(context).pop();
-    } catch (e) {
+    // check email and password
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       // close dialog
       Navigator.of(context).pop();
       // show error dialog
@@ -48,6 +41,7 @@ class _MyLoginPageMobileState extends State<MyLoginPageMobile> {
         builder: (context) {
           return AlertDialog(
             title: const Text("Error"),
+            content: const Text("Email or password cannot be empty"),
             actions: [
               TextButton(
                 onPressed: () {
@@ -59,6 +53,25 @@ class _MyLoginPageMobileState extends State<MyLoginPageMobile> {
           );
         },
       );
+      return;
+    }
+
+    // try sign in
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: username,
+        password: password,
+      );
+
+      // close dialog
+      if (context.mounted) {
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      // close dialog
+      Navigator.of(context).pop();
+      // show error dialog
+      showMessage(context, "Error", "Invalid email or password");
     }
   }
 
@@ -71,6 +84,7 @@ class _MyLoginPageMobileState extends State<MyLoginPageMobile> {
           padding: const EdgeInsets.all(10.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Icon(
                 Icons.phone_android,
@@ -79,16 +93,34 @@ class _MyLoginPageMobileState extends State<MyLoginPageMobile> {
               ),
               SizedBox(height: 30),
               MyTextfield(
-                  text: "Username",
+                  text: "Email",
                   obscureText: false,
-                  controller: _usernameController),
+                  controller: _emailController),
               SizedBox(height: 10),
               MyTextfield(
                   text: "Password",
                   obscureText: true,
                   controller: _passwordController),
               SizedBox(height: 10),
-              MyElevatedButton(text: "Login", onPressed: _login),
+              MyElevatedButton(
+                  text: "Login",
+                  onPressed: () {
+                    _login();
+                  }),
+              SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Don't have an account?"),
+                  GestureDetector(
+                    onTap: widget.onTap,
+                    child: const Text(
+                      " Let's register!",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
