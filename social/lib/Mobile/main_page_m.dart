@@ -25,6 +25,9 @@ class _MyMainPageMobileState extends State<MyMainPageMobile> {
 
     // clear the textfield
     postController.clear();
+
+    // update the UI
+    setState(() {});
   }
 
   @override
