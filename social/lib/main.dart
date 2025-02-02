@@ -1,6 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:social/Mobile/main_page_m.dart';
+import 'package:social/Mobile/profile_page_m.dart';
+import 'package:social/Mobile/users_page_m.dart';
 import 'package:social/Theme/theme_modes.dart';
 import 'package:social/Theme/theme_notifier.dart';
 import 'package:social/auth/auth.dart';
@@ -30,6 +33,11 @@ class MyApp extends StatelessWidget {
           darkTheme: darkTheme,
           home: const AuthPage(),
           themeMode: themeNotifier.themeMode,
+          routes: {
+            "/home": (context) => const MyMainPageMobile(),
+            "/profile": (context) => MyProfilePageMobile(),
+            "/users": (context) => const MyUsersPageMobile(),
+          },
         );
       },
     );

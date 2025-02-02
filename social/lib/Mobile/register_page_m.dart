@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social/components/my_appbar.dart';
@@ -93,7 +94,8 @@ class _MyRegisterPageMobileState extends State<MyRegisterPageMobile> {
           .createUserWithEmailAndPassword(
               email: _emailController.text, password: _passwordController.text);
 
-      // update user profile
+      // create user document and save to the database
+      createUserDocument(userCredential);
 
       // close dialog
       Navigator.pop(context);
@@ -119,6 +121,22 @@ class _MyRegisterPageMobileState extends State<MyRegisterPageMobile> {
           );
         },
       );
+    }
+  }
+
+  void createUserDocument(UserCredential? userCredential) {
+    if (userCredential != null && userCredential.user != null) {
+      // create user document
+      Map<String, dynamic> user = {
+        "email": userCredential.user!.email,
+        "username": _usernameController.text,
+      };
+
+      // save user document to the database
+      FirebaseFirestore.instance
+          .collection("users")
+          .doc(userCredential.user!.email)
+          .set(user);
     }
   }
 

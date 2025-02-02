@@ -9,6 +9,7 @@ class MyDrawer extends StatelessWidget {
     return Drawer(
       child: ListView(
         children: [
+          // drawer header
           DrawerHeader(
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
@@ -21,11 +22,52 @@ class MyDrawer extends StatelessWidget {
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
                 Text(FirebaseAuth.instance.currentUser?.email ?? ''),
+                SizedBox(height: 10),
               ],
             ),
           ),
+
+          // home tile
           ListTile(
-            title: const Text('Logout'),
+            title: const Text('H O M E'),
+            leading: Icon(Icons.home,
+                color: Theme.of(context).colorScheme.onSurface),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+
+          // profile tile
+          ListTile(
+            title: const Text('P R O F I L E'),
+            leading: Icon(Icons.person,
+                color: Theme.of(context).colorScheme.onSurface),
+            onTap: () {
+              // pop drawer
+              Navigator.pop(context);
+
+              // navigate to profile page
+              Navigator.pushNamed(context, '/profile');
+            },
+          ),
+
+          // users tile
+          ListTile(
+            title: const Text('U S E R S'),
+            leading: Icon(Icons.person,
+                color: Theme.of(context).colorScheme.onSurface),
+            onTap: () {
+              // pop drawer
+              Navigator.pop(context);
+
+              // navigate to users page
+              Navigator.pushNamed(context, '/users');
+            },
+          ),
+
+          // logout tile
+          ListTile(
+            title: const Text('L O G O U T'),
             leading: Icon(Icons.logout,
                 color: Theme.of(context).colorScheme.onSurface),
             onTap: () {
