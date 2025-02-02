@@ -20,71 +20,54 @@ class MyProfilePageDesktop extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MyAppbar(title: "s o C I a l"),
-      body: FutureBuilder(
-        future: getUserDetails(),
-        builder: (context, snapshot) {
-          // loading
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          // error
-          if (snapshot.hasError) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.face_retouching_off, size: 120),
-                Text("Something went wrong"),
-              ],
-            );
-          }
-          // success
-          if (snapshot.hasData) {
-            // extract data
-            Map<String, dynamic>? user = snapshot.data!.data();
+        appBar: MyAppbar(title: "s o C I a L"),
+        body: FutureBuilder(
+          future: getUserDetails(),
+          builder: (context, snapshot) {
+            // loading
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            // error
+            if (snapshot.hasError) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.face_retouching_off, size: 160),
+                  Text("Something went wrong", style: TextStyle(fontSize: 32)),
+                ],
+              );
+            }
+            // success
+            if (snapshot.hasData) {
+              // extract data
+              Map<String, dynamic>? user = snapshot.data!.data();
 
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(30.0),
+              return Center(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Icon(Icons.face, size: 150),
-                    SizedBox(height: 20),
+                    const Icon(Icons.face, size: 160),
                     Text(
                       user!["username"],
                       style:
-                          TextStyle(fontSize: 60, fontWeight: FontWeight.bold),
+                          TextStyle(fontSize: 64, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 15),
-                    Text(user["email"], style: TextStyle(fontSize: 30)),
-                    SizedBox(height: 30),
-                    // Add additional user info sections
-                    Text(
-                      "Followers: 120", // Just an example
-                      style: TextStyle(fontSize: 25),
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      "Bio: Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                      style: TextStyle(fontSize: 25),
-                    ),
+                    Text(user["email"], style: TextStyle(fontSize: 32)),
                   ],
                 ),
-              ),
-            );
-          }
+              );
+            }
 
-          // no data
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.face_retouching_off, size: 120),
-              Text("No data"),
-            ],
-          );
-        },
-      ),
-    );
+            // no data
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.face_retouching_off, size: 160),
+                Text("No data", style: TextStyle(fontSize: 32)),
+              ],
+            );
+          },
+        ));
   }
 }

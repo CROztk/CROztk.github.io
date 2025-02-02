@@ -20,62 +20,54 @@ class MyProfilePageTablet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MyAppbar(title: "s o C I a l"),
-      body: FutureBuilder(
-        future: getUserDetails(),
-        builder: (context, snapshot) {
-          // loading
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          // error
-          if (snapshot.hasError) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.face_retouching_off, size: 100),
-                Text("Something went wrong"),
-              ],
-            );
-          }
-          // success
-          if (snapshot.hasData) {
-            // extract data
-            Map<String, dynamic>? user = snapshot.data!.data();
+        appBar: MyAppbar(title: "s o C I a L"),
+        body: FutureBuilder(
+          future: getUserDetails(),
+          builder: (context, snapshot) {
+            // loading
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            // error
+            if (snapshot.hasError) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.face_retouching_off, size: 120),
+                  Text("Something went wrong", style: TextStyle(fontSize: 24)),
+                ],
+              );
+            }
+            // success
+            if (snapshot.hasData) {
+              // extract data
+              Map<String, dynamic>? user = snapshot.data!.data();
 
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
+              return Center(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const Icon(Icons.face, size: 120),
-                    SizedBox(height: 20),
                     Text(
                       user!["username"],
                       style:
-                          TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+                          TextStyle(fontSize: 56, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 10),
-                    Text(user["email"], style: TextStyle(fontSize: 20)),
-                    SizedBox(height: 20),
-                    // Add more profile details if needed here
+                    Text(user["email"], style: TextStyle(fontSize: 24)),
                   ],
                 ),
-              ),
-            );
-          }
+              );
+            }
 
-          // no data
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.face_retouching_off, size: 100),
-              Text("No data"),
-            ],
-          );
-        },
-      ),
-    );
+            // no data
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.face_retouching_off, size: 120),
+                Text("No data", style: TextStyle(fontSize: 24)),
+              ],
+            );
+          },
+        ));
   }
 }

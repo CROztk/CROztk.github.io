@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:social/components/my_appbar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:social/database/firestore.dart';
 
 class MyMainPageDesktop extends StatefulWidget {
@@ -14,6 +14,7 @@ class _MyMainPageDesktopState extends State<MyMainPageDesktop> {
   final TextEditingController postController = TextEditingController();
   final FireStoreDatabase fireStore = FireStoreDatabase();
 
+  // Post message function
   void postMessage() {
     fireStore.addPost(postController.text);
     postController.clear();
@@ -25,22 +26,50 @@ class _MyMainPageDesktopState extends State<MyMainPageDesktop> {
     return Scaffold(
       appBar: AppBar(
         title: Text("s o C I a l"),
+        backgroundColor: Theme.of(context)
+            .colorScheme
+            .surface, // Match navbar background with the theme
         actions: [
           TextButton(
-            onPressed: () {},
-            child: Text("Home", style: TextStyle(color: Colors.white)),
+            onPressed: () {
+              // Stay on the current page when Home is clicked
+            },
+            child: Text("Home",
+                style: TextStyle(
+                    color: Colors.grey[400],
+                    fontSize: 18)), // Larger text and light gray
           ),
           TextButton(
-            onPressed: () {},
-            child: Text("Profile", style: TextStyle(color: Colors.white)),
+            onPressed: () {
+              // Navigate to Profile page
+              Navigator.pushNamed(context, '/profile');
+            },
+            child: Text("Profile",
+                style: TextStyle(
+                    color: Colors.grey[400],
+                    fontSize: 18)), // Larger text and light gray
           ),
           TextButton(
-            onPressed: () {},
-            child: Text("Users", style: TextStyle(color: Colors.white)),
+            onPressed: () {
+              // Navigate to Users page
+              Navigator.pushNamed(context, '/users');
+            },
+            child: Text("Users",
+                style: TextStyle(
+                    color: Colors.grey[400],
+                    fontSize: 18)), // Larger text and light gray
           ),
           TextButton(
-            onPressed: () {},
-            child: Text("Logout", style: TextStyle(color: Colors.white)),
+            onPressed: () {
+              // Logout and navigate to the login page
+              FirebaseAuth.instance.signOut();
+              Navigator.pushReplacementNamed(
+                  context, '/login'); // Navigate to login page after logout
+            },
+            child: Text("Logout",
+                style: TextStyle(
+                    color: Colors.grey[400],
+                    fontSize: 18)), // Larger text and light gray
           ),
         ],
       ),
@@ -107,11 +136,9 @@ class _MyMainPageDesktopState extends State<MyMainPageDesktop> {
                               Text(posts[index]["username"],
                                   style: TextStyle(fontSize: 24)),
                               Text(
-                                  timestamp
-                                      .toDate()
-                                      .toString()
-                                      .substring(0, 16),
-                                  style: TextStyle(fontSize: 22)),
+                                timestamp.toDate().toString().substring(0, 16),
+                                style: TextStyle(fontSize: 22),
+                              ),
                             ],
                           ),
                         );
@@ -128,7 +155,7 @@ class _MyMainPageDesktopState extends State<MyMainPageDesktop> {
                   );
                 },
               ),
-            )
+            ),
           ],
         ),
       ),
