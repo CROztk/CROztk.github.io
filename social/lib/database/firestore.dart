@@ -38,9 +38,24 @@ class FireStoreDatabase {
   }
 
   // delete post from the database
+  Future<void> deletePost(String id) async {
+    await posts.doc(id).delete();
+  }
 
   // read posts from the database
   Stream<QuerySnapshot> getPosts() {
     return posts.orderBy("timestamp", descending: true).snapshots();
+  }
+
+  // check if user is owner of the post
+  Future<bool> isOwner(String id) async {
+    final post = await posts.doc(id).get();
+    final postData = post.data() as Map<String, dynamic>;
+    final currentUsername = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser!.email)
+        .get()
+        .then((value) => value.data()!["username"]);
+    return postData["username"] == currentUsername;
   }
 }

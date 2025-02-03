@@ -49,7 +49,9 @@ class _MyMainPageMobileState extends State<MyMainPageMobile> {
                     border: OutlineInputBorder(),
                   ),
                   onChanged: (value) {
-                    setState(() {});
+                    if (value.length < 2) {
+                      setState(() {});
+                    }
                   },
                 ),
               ),
@@ -86,15 +88,32 @@ class _MyMainPageMobileState extends State<MyMainPageMobile> {
                     itemCount: posts.length,
                     itemBuilder: (context, index) {
                       Timestamp timestamp = posts[index]["timestamp"];
+                      String username = posts[index]["username"];
+                      String message = posts[index]["message"];
                       return ListTile(
-                        title: Text(posts[index]["message"]),
+                        title: Text(message),
                         subtitle: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(posts[index]["username"]),
+                            Text(username),
                             Text(
                                 timestamp.toDate().toString().substring(0, 16)),
                           ],
+                        ),
+                        trailing: FutureBuilder(
+                          future: fireStore.isOwner(posts[index].id),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData && snapshot.data == true) {
+                              return IconButton(
+                                icon: Icon(Icons.delete),
+                                onPressed: () {
+                                  fireStore.deletePost(posts[index].id);
+                                  setState(() {});
+                                },
+                              );
+                            }
+                            return const SizedBox();
+                          },
                         ),
                       );
                     },
