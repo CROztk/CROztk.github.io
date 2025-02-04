@@ -79,6 +79,39 @@ class Storage {
     _isUploading = false;
   }
 
+  // upload image with XFile
+  Future<String> uploadImageXFile(
+      String folderName, String imageName, XFile image) async {
+    // set uploading status
+    _isUploading = true;
+
+    String url = "";
+
+    // try to upload the file
+    try {
+      // path to the image
+      String path = "$folderName/$imageName.png";
+
+      // upload the file
+      await storage.ref(path).putData(await image.readAsBytes()).then((task) {
+        task.ref.getDownloadURL().then((value) {
+          url = value;
+        });
+      });
+
+      // set uploading status
+      _isUploading = false;
+    } catch (e) {
+      // set uploading status
+      _isUploading = false;
+    }
+
+    // set uploading status
+    _isUploading = false;
+
+    return url;
+  }
+
   // delete image with the name imageName under the folder folderName
   Future<void> deleteImage(String folderName, String imageName) async {
     // delete the image
