@@ -1,34 +1,49 @@
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:social/components/my_appbar.dart';
-import 'package:social/database/storage.dart';
 
 class MyUsersPageMobile extends StatefulWidget {
-  const MyUsersPageMobile({super.key});
-
   @override
-  State<MyUsersPageMobile> createState() => _MyUsersPageMobileState();
+  _MyUsersPageMobileState createState() => _MyUsersPageMobileState();
 }
 
 class _MyUsersPageMobileState extends State<MyUsersPageMobile> {
-  final storage = Storage();
-  final currentUser = FirebaseAuth.instance.currentUser;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  User? currentUser;
+  Map<String, bool> followedUsers =
+      {}; // To store the follow status for each user
 
-  // This will hold the following status of users
-  Map<String, bool> followedUsers = {};
+  @override
+  void initState() {
+    super.initState();
+    currentUser = _auth.currentUser;
+    _loadFollowedUsers();
+  }
 
-  // Follow a user by updating Firebase Firestore
-  void _followUser(String userEmail) async {
-    final userDoc =
-        FirebaseFirestore.instance.collection("users").doc(userEmail);
+  // Load the list of followed users from Firestore
+  Future<void> _loadFollowedUsers() async {
+    if (currentUser == null) return;
 
-    // Add current user to the followed user's followers list
-    await userDoc.update({
-      'followers': FieldValue.arrayUnion([currentUser!.email]),
+    final docSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser!.email)
+        .get();
+
+    final followingList = List<String>.from(docSnapshot['following'] ?? []);
+
+    setState(() {
+      followedUsers.clear(); // Clear previous follow status
+      for (var user in followingList) {
+        followedUsers[user] = true; // Mark users as followed
+      }
     });
+  }
 
-    // Optionally, update the current user's following list as well
+  // Follow a user and update Firestore
+  Future<void> _followUser(String userEmail) async {
+    if (currentUser == null) return;
+
+    // Add the user to the current user's 'following' list
     await FirebaseFirestore.instance
         .collection("users")
         .doc(currentUser!.email)
@@ -36,9 +51,13 @@ class _MyUsersPageMobileState extends State<MyUsersPageMobile> {
       'following': FieldValue.arrayUnion([userEmail]),
     });
 
-    // Update the followed status locally
+    // Add the current user to the followed user's 'followers' list
+    await FirebaseFirestore.instance.collection("users").doc(userEmail).update({
+      'followers': FieldValue.arrayUnion([currentUser!.email]),
+    });
+
     setState(() {
-      followedUsers[userEmail] = true;
+      followedUsers[userEmail] = true; // Update button to "Following"
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -46,100 +65,118 @@ class _MyUsersPageMobileState extends State<MyUsersPageMobile> {
     );
   }
 
+  // Unfollow a user and update Firestore
+  Future<void> _unfollowUser(String userEmail) async {
+    if (currentUser == null) return;
+
+    // Remove the user from the current user's 'following' list
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(currentUser!.email)
+        .update({
+      'following': FieldValue.arrayRemove([userEmail]),
+    });
+
+    // Remove the current user from the followed user's 'followers' list
+    await FirebaseFirestore.instance.collection("users").doc(userEmail).update({
+      'followers': FieldValue.arrayRemove([currentUser!.email]),
+    });
+
+    setState(() {
+      followedUsers[userEmail] = false; // Update button to "Follow"
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("User unfollowed successfully!")),
+    );
+  }
+
+  // Show dialog to confirm unfollow action
+  void _showUnfollowDialog(String userEmail) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Unfollow $userEmail?"),
+          content: const Text("Are you sure you want to unfollow this user?"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                _unfollowUser(userEmail);
+                Navigator.of(context).pop();
+              },
+              child: const Text("Yes"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "s o C I a l",
-          style: TextStyle(
-              fontSize: 24, color: Colors.amber), // Updated text size and color
-        ),
-        actions: [
-          // Home button (does nothing as per request)
-          IconButton(
-            icon: Icon(Icons.home),
-            onPressed: () {
-              // Keeps the user on the current page (no action needed)
-            },
-          ),
-          // Logout button
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () {
-              FirebaseAuth.instance.signOut();
-              Navigator.pushReplacementNamed(
-                  context, '/login'); // Navigate to login page
-            },
-          ),
-        ],
+        title: const Text("Users"),
       ),
-      body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection("users").snapshots(),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isNotEqualTo: currentUser!.email)
+            .snapshots(),
         builder: (context, snapshot) {
-          // loading
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          // error
+
           if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                children: [
-                  const Icon(Icons.people_alt, size: 80),
-                  Text("Something went wrong"),
-                ],
-              ),
-            );
+            return const Center(child: Text('Error loading users'));
           }
-          // success
-          if (snapshot.hasData) {
-            // extract data
-            final users = snapshot.data!.docs;
 
-            return ListView.builder(
-              itemCount: users.length,
-              itemBuilder: (context, index) {
-                String userEmail = users[index]["email"];
-                bool isFollowed = followedUsers[userEmail] ?? false;
-
-                return ListTile(
-                  title: Text(users[index]["username"]),
-                  subtitle: Text(users[index]["email"]),
-                  leading: FutureBuilder(
-                      future: storage.getImage(
-                          "profile_photos/", "${users[index]["email"]}.png"),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const CircularProgressIndicator();
-                        }
-                        if (snapshot.hasData) {
-                          return CircleAvatar(
-                            backgroundImage:
-                                NetworkImage(snapshot.data.toString()),
-                          );
-                        }
-                        return const Icon(Icons.person, size: 40);
-                      }),
-                  trailing: ElevatedButton(
-                    onPressed: isFollowed
-                        ? null // Disable button if already followed
-                        : () => _followUser(userEmail),
-                    child: Text(isFollowed ? "Following" : "Follow"),
-                  ),
-                );
-              },
-            );
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text('No users found'));
           }
-          // no data
-          return Center(
-            child: Column(
-              children: [
-                const Icon(Icons.person, size: 80),
-                Text("No users found"),
-              ],
-            ),
+
+          var users = snapshot.data!.docs;
+
+          return ListView.builder(
+            itemCount: users.length,
+            itemBuilder: (context, index) {
+              var userData = users[index];
+              String userEmail = userData['email'];
+
+              return ListTile(
+                title: Text(userData['name'] ?? 'No Name'),
+                subtitle: Text(userEmail),
+                trailing: followedUsers[userEmail] == true
+                    ? ElevatedButton(
+                        onPressed: () {
+                          _showUnfollowDialog(
+                              userEmail); // Show unfollow dialog
+                        },
+                        child: const Text("Following"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              Colors.blue, // Indicating the user is following
+                        ),
+                      )
+                    : ElevatedButton(
+                        onPressed: () {
+                          _followUser(userEmail); // Follow the user
+                        },
+                        child: const Text("Follow"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey, // Default color
+                        ),
+                      ),
+              );
+            },
           );
         },
       ),
