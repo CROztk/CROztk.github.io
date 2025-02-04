@@ -1,9 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:social/database/storage.dart';
 
-class MyDrawer extends StatelessWidget {
+class MyDrawer extends StatefulWidget {
   const MyDrawer({super.key});
 
+  @override
+  State<MyDrawer> createState() => _MyDrawerState();
+}
+
+class _MyDrawerState extends State<MyDrawer> {
+  final currentUser = FirebaseAuth.instance.currentUser;
+  final storage = Storage();
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -16,12 +24,28 @@ class MyDrawer extends StatelessWidget {
             ),
             child: Column(
               children: [
-                Icon(
-                  Icons.account_circle,
-                  size: 100,
-                  color: Theme.of(context).colorScheme.onSurface,
+                FutureBuilder(
+                  future: storage.getImage(
+                      "profile_photos/", "${currentUser!.email!}.png"),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return SizedBox(
+                          width: 90,
+                          height: 90,
+                          child: const CircularProgressIndicator());
+                    }
+                    if (snapshot.hasData) {
+                      return CircleAvatar(
+                        backgroundImage: NetworkImage(snapshot.data.toString()),
+                        radius: 50,
+                      );
+                    }
+                    return const CircleAvatar(
+                      radius: 50,
+                    );
+                  },
                 ),
-                Text(FirebaseAuth.instance.currentUser?.email ?? ''),
+                Text(currentUser?.email ?? ''),
                 SizedBox(height: 10),
               ],
             ),
