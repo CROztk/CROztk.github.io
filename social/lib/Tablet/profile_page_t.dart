@@ -65,10 +65,6 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    bool isTablet = screenWidth > 600;
-
     return Scaffold(
       appBar: MyAppbar(title: "Profile"),
       body: FutureBuilder(
@@ -92,151 +88,170 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
             bioController.text = user?['bio'] ?? '';
             dobController.text = user?['dob'] ?? '';
 
-            return SingleChildScrollView(
-              child: Center(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: isTablet ? screenWidth * 0.2 : 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+            return Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Stack(
+                    alignment: Alignment.center,
                     children: [
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          FutureBuilder(
-                            future: storage.getImage("profile_photos/",
-                                "${currentUser!.email!}.png"),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                return CircleAvatar(
-                                  radius: isTablet ? 80 : 45,
-                                  backgroundImage:
-                                      NetworkImage(snapshot.data.toString()),
-                                );
-                              }
-                              return const Icon(Icons.face, size: 80);
-                            },
-                          ),
-                          SizedBox(
-                            height: isTablet ? 140 : 110,
-                            width: isTablet ? 140 : 110,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                IconButton(
-                                  onPressed: _changeProfilePicture,
-                                  icon: const Icon(Icons.edit),
-                                ),
-                              ],
+                      FutureBuilder(
+                        future: storage.getImage(
+                            "profile_photos/", "${currentUser!.email!}.png"),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return CircleAvatar(
+                              radius: 45,
+                              backgroundImage:
+                                  NetworkImage(snapshot.data.toString()),
+                            );
+                          }
+                          return const Icon(Icons.face, size: 80);
+                        },
+                      ),
+                      SizedBox(
+                        height: 110,
+                        width: 110,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            IconButton(
+                              onPressed: _changeProfilePicture,
+                              icon: const Icon(Icons.edit),
                             ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    user!["username"],
+                    style: const TextStyle(
+                        fontSize: 32, fontWeight: FontWeight.bold),
+                  ),
+                  Text(user["email"]),
+                  Text(user["dob"] ?? "No birth date provided"),
+                  Text(user["bio"] ?? "No bio available"),
+                  const Divider(),
+                  if (!isEditing)
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          isEditing = true;
+                        });
+                      },
+                      child: const Text("Edit Profile"),
+                    ),
+                  if (isEditing)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: nameController,
+                            decoration: const InputDecoration(
+                              labelText: 'Edit Name',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          TextFormField(
+                            controller: dobController,
+                            decoration: const InputDecoration(
+                              labelText: 'Edit Date of Birth',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          TextFormField(
+                            controller: bioController,
+                            maxLines: 3,
+                            decoration: const InputDecoration(
+                              labelText: 'Edit Bio',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          ElevatedButton(
+                            onPressed: _saveProfile,
+                            child: const Text("Save Profile"),
                           ),
                         ],
                       ),
-                      Text(
-                        user!["username"],
-                        style: TextStyle(
-                          fontSize: isTablet ? 36 : 32,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(user["email"]),
-                      Text(user["dob"] ?? "No birth date provided"),
-                      Text(user["bio"] ?? "No bio available"),
-                      const Divider(),
-                      if (!isEditing)
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              isEditing = true;
-                            });
-                          },
-                          child: const Text("Edit Profile"),
-                        ),
-                      if (isEditing)
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              TextFormField(
-                                controller: nameController,
-                                decoration: const InputDecoration(
-                                  labelText: 'Edit Name',
-                                  border: OutlineInputBorder(),
+                    ),
+                  const Divider(),
+                  StreamBuilder(
+                    stream: fireStore.getPosts(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (snapshot.hasError) {
+                        return Column(
+                          children: const [
+                            Icon(Icons.error, size: 80),
+                            Text("Something went wrong"),
+                          ],
+                        );
+                      }
+                      if (snapshot.hasData) {
+                        final posts = snapshot.data!.docs;
+                        return Expanded(
+                          child: ListView.builder(
+                            itemCount: posts.length,
+                            itemBuilder: (context, index) {
+                              Timestamp timestamp = posts[index]["timestamp"];
+                              String username = posts[index]["username"];
+                              String message = posts[index]["message"];
+                              if (user["username"] != username) {
+                                return const SizedBox();
+                              }
+                              return ListTile(
+                                title: Text(message),
+                                subtitle: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(username),
+                                    Text(timestamp
+                                        .toDate()
+                                        .toString()
+                                        .substring(0, 16)),
+                                  ],
                                 ),
-                              ),
-                              const SizedBox(height: 10),
-                              TextFormField(
-                                controller: dobController,
-                                decoration: const InputDecoration(
-                                  labelText: 'Edit Date of Birth',
-                                  border: OutlineInputBorder(),
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.delete),
+                                  onPressed: () {
+                                    fireStore.deletePost(posts[index].id);
+                                    setState(() {});
+                                  },
                                 ),
-                              ),
-                              const SizedBox(height: 10),
-                              TextFormField(
-                                controller: bioController,
-                                maxLines: 3,
-                                decoration: const InputDecoration(
-                                  labelText: 'Edit Bio',
-                                  border: OutlineInputBorder(),
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              ElevatedButton(
-                                onPressed: _saveProfile,
-                                child: const Text("Save Profile"),
-                              ),
-                            ],
+                              );
+                            },
                           ),
-                        ),
-                      const Divider(),
-                      StreamBuilder(
-                        stream: fireStore.getPosts(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          }
-                          if (snapshot.hasError) {
-                            return Column(
-                              children: const [
-                                Icon(Icons.error, size: 80),
-                                Text("Something went wrong"),
-                              ],
-                            );
-                          }
-                          if (snapshot.hasData) {
-                            final posts = snapshot.data!.docs;
-                            return ListView.builder(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: posts.length,
-                              itemBuilder: (context, index) {
-                                Timestamp timestamp = posts[index]["timestamp"];
-                                String username = posts[index]["username"];
-                                String message = posts[index]["message"];
-                                if (user["username"] != username) {
-                                  return const SizedBox();
-                                }
-                                return ListTile(
-                                  title: Text(message),
-                                  subtitle: Text(timestamp.toDate().toString()),
-                                );
-                              },
-                            );
-                          }
-                          return const Text("No data available");
-                        },
-                      )
-                    ],
-                  ),
-                ),
+                        );
+                      }
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.face_retouching_off, size: 80),
+                          Text("No data"),
+                        ],
+                      );
+                    },
+                  )
+                ],
               ),
             );
           }
-          return const Text("No data available");
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Icon(Icons.face_retouching_off, size: 80),
+              Text("No data"),
+            ],
+          );
         },
       ),
     );
