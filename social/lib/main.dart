@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
           routes: {
             "/home": (context) => const MyMainPageMobile(),
             "/profile": (context) => MyProfilePageMobile(),
-            "/users": (context) => const MyUsersPageMobile(),
+            "/users": (context) => MyUsersPageMobile(),
           },
         );
       },

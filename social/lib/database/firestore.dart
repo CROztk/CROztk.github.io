@@ -31,10 +31,27 @@ class FireStoreDatabase {
       "message": message,
       "username": username,
       "timestamp": Timestamp.now(),
+      "email": currentUser!.email,
+      "likedUsers": []
     };
 
     // save post to the database
     await posts.add(post);
+  }
+
+  // like post
+  Future<void> likePost(String id) async {
+    final post = await posts.doc(id).get();
+    final postData = post.data() as Map<String, dynamic>;
+    // add user to the liked users
+    final likedUsers = postData["likedUsers"] as List<dynamic>;
+    if (likedUsers.contains(currentUser!.email)) {
+      likedUsers.remove(currentUser!.email);
+    } else {
+      likedUsers.add(currentUser!.email);
+    }
+    // update post
+    await posts.doc(id).update({"likedUsers": likedUsers});
   }
 
   // delete post from the database
@@ -45,6 +62,11 @@ class FireStoreDatabase {
   // read posts from the database
   Stream<QuerySnapshot> getPosts() {
     return posts.orderBy("timestamp", descending: true).snapshots();
+  }
+
+  // get posts of a specific user
+  Stream<QuerySnapshot> getUserPosts(String email) {
+    return posts.where("email", isEqualTo: email).snapshots();
   }
 
   // check if user is owner of the post

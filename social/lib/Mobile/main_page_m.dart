@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:social/components/my_appbar.dart';
 import 'package:social/components/my_drawer.dart';
+import 'package:social/components/my_text_post.dart';
 import 'package:social/database/firestore.dart';
 
 class MyMainPageMobile extends StatefulWidget {
@@ -87,35 +88,7 @@ class _MyMainPageMobileState extends State<MyMainPageMobile> {
                   child: ListView.builder(
                     itemCount: posts.length,
                     itemBuilder: (context, index) {
-                      Timestamp timestamp = posts[index]["timestamp"];
-                      String username = posts[index]["username"];
-                      String message = posts[index]["message"];
-                      return ListTile(
-                        title: Text(message),
-                        subtitle: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(username),
-                            Text(
-                                timestamp.toDate().toString().substring(0, 16)),
-                          ],
-                        ),
-                        trailing: FutureBuilder(
-                          future: fireStore.isOwner(posts[index].id),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData && snapshot.data == true) {
-                              return IconButton(
-                                icon: Icon(Icons.delete),
-                                onPressed: () {
-                                  fireStore.deletePost(posts[index].id);
-                                  setState(() {});
-                                },
-                              );
-                            }
-                            return const SizedBox();
-                          },
-                        ),
-                      );
+                      return MyTextPost(post: posts[index]);
                     },
                   ),
                 );

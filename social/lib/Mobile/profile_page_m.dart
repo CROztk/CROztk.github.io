@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:social/components/my_appbar.dart';
+import 'package:social/components/my_textfield.dart';
 import 'package:social/database/firestore.dart';
 import 'package:social/database/storage.dart';
 
@@ -19,14 +21,32 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
 
   TextEditingController bioController = TextEditingController();
   TextEditingController nameController = TextEditingController();
-  TextEditingController dobController = TextEditingController();
+  Timestamp dobTimestamp = Timestamp.now();
   bool isEditing = false;
 
-  Future<DocumentSnapshot<Map<String, dynamic>>> getUserDetails() async {
-    return await FirebaseFirestore.instance
+  // all user information fields
+  // username, email, dob, bio, following, followers
+  String username = '';
+  String email = '';
+  String dob = '';
+  String bio = '';
+  List<String> following = [];
+  List<String> followers = [];
+
+  // Fetch the user details from Firestore
+  Future<DocumentSnapshot<Map<String, dynamic>>> loadUserDetails() async {
+    final userDetails = await FirebaseFirestore.instance
         .collection('users')
         .doc(currentUser!.email)
         .get();
+    // set the user details
+    username = userDetails['username'];
+    email = userDetails['email'];
+    dob = userDetails['dob'].toString().substring(0, 10);
+    bio = userDetails['bio'];
+    following = List<String>.from(userDetails['following'] ?? []);
+    followers = List<String>.from(userDetails['followers'] ?? []);
+    return userDetails;
   }
 
   // Fetch the list of users being followed by the current user
@@ -62,7 +82,7 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
         .update({
       'bio': bioController.text,
       'username': nameController.text,
-      'dob': dobController.text,
+      'dob': dobTimestamp,
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -79,7 +99,7 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
     return Scaffold(
       appBar: MyAppbar(title: "Profile"),
       body: FutureBuilder(
-        future: getUserDetails(),
+        future: loadUserDetails(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -97,7 +117,7 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
             Map<String, dynamic>? user = snapshot.data!.data();
             nameController.text = user?['username'] ?? '';
             bioController.text = user?['bio'] ?? '';
-            dobController.text = user?['dob'] ?? '';
+            dobTimestamp = user?['dob'] ?? Timestamp.now();
 
             return Center(
               child: Column(
@@ -137,13 +157,13 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
                     ],
                   ),
                   Text(
-                    user!["username"],
+                    username,
                     style: const TextStyle(
                         fontSize: 32, fontWeight: FontWeight.bold),
                   ),
-                  Text(user["email"]),
-                  Text(user["dob"] ?? "No birth date provided"),
-                  Text(user["bio"] ?? "No bio available"),
+                  Text(email),
+                  Text(dobTimestamp.toDate().toString().substring(0, 10)),
+                  Text(bio),
                   const Divider(),
 
                   // Display the list of followed users
@@ -158,13 +178,10 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
                         return const Text("Error fetching followed users.");
                       }
                       if (followingSnapshot.hasData) {
-                        List<String> followedUsers = followingSnapshot.data!;
                         return Column(
                           children: [
-                            const Text("Following Users:"),
-                            for (var followedUser in followedUsers)
-                              Text(
-                                  followedUser), // Displaying followed user's email or username
+                            Text(
+                                "Following Users: ${following.length}, Followers: ${followers.length}"), // Displaying number of followed users
                           ],
                         );
                       }
@@ -181,27 +198,35 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
                         });
                       },
                       child: const Text("Edit Profile"),
-                    ),
-                  if (isEditing)
+                    )
+                  else
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         children: [
-                          TextFormField(
-                            controller: nameController,
-                            decoration: const InputDecoration(
-                              labelText: 'Edit Name',
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
+                          MyTextfield(
+                              text: "Edit Username",
+                              obscureText: false,
+                              controller: nameController),
                           const SizedBox(height: 10),
-                          TextFormField(
-                            controller: dobController,
-                            decoration: const InputDecoration(
-                              labelText: 'Edit Date of Birth',
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
+                          TextButton(
+                              onPressed: () {
+                                showDatePicker(
+                                  context: context,
+                                  initialDate:
+                                      DateTime(DateTime.now().year - 18),
+                                  firstDate: DateTime(1900),
+                                  lastDate: DateTime(DateTime.now().year - 18),
+                                ).then((value) {
+                                  if (value != null) {
+                                    dobTimestamp = Timestamp.fromDate(value);
+                                  }
+                                });
+                              },
+                              child: Text(dobTimestamp
+                                  .toDate()
+                                  .toString()
+                                  .substring(0, 10))),
                           const SizedBox(height: 10),
                           TextFormField(
                             controller: bioController,
@@ -212,16 +237,28 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
                             ),
                           ),
                           const SizedBox(height: 10),
-                          ElevatedButton(
-                            onPressed: _saveProfile,
-                            child: const Text("Save Profile"),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      isEditing = false;
+                                    });
+                                  },
+                                  child: const Text("Cancel")),
+                              ElevatedButton(
+                                onPressed: _saveProfile,
+                                child: const Text("Save Profile"),
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ),
                   const Divider(),
                   StreamBuilder(
-                    stream: fireStore.getPosts(),
+                    stream: fireStore.getUserPosts(email),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
@@ -243,7 +280,7 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
                               Timestamp timestamp = posts[index]["timestamp"];
                               String username = posts[index]["username"];
                               String message = posts[index]["message"];
-                              if (user["username"] != username) {
+                              if (username != username) {
                                 return const SizedBox();
                               }
                               return ListTile(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:social/components/my_user_card.dart';
 
 class MyUsersPageMobile extends StatefulWidget {
   @override
@@ -39,86 +40,6 @@ class _MyUsersPageMobileState extends State<MyUsersPageMobile> {
     });
   }
 
-  // Follow a user and update Firestore
-  Future<void> _followUser(String userEmail) async {
-    if (currentUser == null) return;
-
-    // Add the user to the current user's 'following' list
-    await FirebaseFirestore.instance
-        .collection("users")
-        .doc(currentUser!.email)
-        .update({
-      'following': FieldValue.arrayUnion([userEmail]),
-    });
-
-    // Add the current user to the followed user's 'followers' list
-    await FirebaseFirestore.instance.collection("users").doc(userEmail).update({
-      'followers': FieldValue.arrayUnion([currentUser!.email]),
-    });
-
-    setState(() {
-      followedUsers[userEmail] = true; // Update button to "Following"
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("User followed successfully!")),
-    );
-  }
-
-  // Unfollow a user and update Firestore
-  Future<void> _unfollowUser(String userEmail) async {
-    if (currentUser == null) return;
-
-    // Remove the user from the current user's 'following' list
-    await FirebaseFirestore.instance
-        .collection("users")
-        .doc(currentUser!.email)
-        .update({
-      'following': FieldValue.arrayRemove([userEmail]),
-    });
-
-    // Remove the current user from the followed user's 'followers' list
-    await FirebaseFirestore.instance.collection("users").doc(userEmail).update({
-      'followers': FieldValue.arrayRemove([currentUser!.email]),
-    });
-
-    setState(() {
-      followedUsers[userEmail] = false; // Update button to "Follow"
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("User unfollowed successfully!")),
-    );
-  }
-
-  // Show dialog to confirm unfollow action
-  void _showUnfollowDialog(String userEmail) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Unfollow $userEmail?"),
-          content: const Text("Are you sure you want to unfollow this user?"),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () {
-                _unfollowUser(userEmail);
-                Navigator.of(context).pop();
-              },
-              child: const Text("Yes"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -149,33 +70,34 @@ class _MyUsersPageMobileState extends State<MyUsersPageMobile> {
             itemCount: users.length,
             itemBuilder: (context, index) {
               var userData = users[index];
-              String userEmail = userData['email'];
 
-              return ListTile(
-                title: Text(userData['name'] ?? 'No Name'),
-                subtitle: Text(userEmail),
-                trailing: followedUsers[userEmail] == true
-                    ? ElevatedButton(
-                        onPressed: () {
-                          _showUnfollowDialog(
-                              userEmail); // Show unfollow dialog
-                        },
-                        child: const Text("Following"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Colors.blue, // Indicating the user is following
-                        ),
-                      )
-                    : ElevatedButton(
-                        onPressed: () {
-                          _followUser(userEmail); // Follow the user
-                        },
-                        child: const Text("Follow"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey, // Default color
-                        ),
-                      ),
-              );
+              return MyUserCard(
+                  userData: userData, followedUsers: followedUsers);
+              // ListTile(
+              //   title: Text(userData['username'] ?? 'No Name'),
+              //   subtitle: Text(userEmail),
+              //   trailing: followedUsers[userEmail] == true
+              //       ? ElevatedButton(
+              //           onPressed: () {
+              //             _showUnfollowDialog(
+              //                 userEmail); // Show unfollow dialog
+              //           },
+              //           child: const Text("Following"),
+              //           style: ElevatedButton.styleFrom(
+              //             backgroundColor:
+              //                 Colors.blue, // Indicating the user is following
+              //           ),
+              //         )
+              //       : ElevatedButton(
+              //           onPressed: () {
+              //             _followUser(userEmail); // Follow the user
+              //           },
+              //           child: const Text("Follow"),
+              //           style: ElevatedButton.styleFrom(
+              //             backgroundColor: Colors.grey, // Default color
+              //           ),
+              //         ),
+              // );
             },
           );
         },
