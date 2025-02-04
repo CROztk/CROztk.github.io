@@ -29,6 +29,17 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
         .get();
   }
 
+  // Fetch the list of users being followed by the current user
+  Future<List<String>> getFollowingUsers() async {
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser!.email)
+        .get();
+    List<dynamic>? followingList =
+        (userDoc.data() as Map<String, dynamic>?)?['following'];
+    return followingList != null ? List<String>.from(followingList) : [];
+  }
+
   void _changeProfilePicture() async {
     showDialog(
       context: context,
@@ -133,6 +144,34 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
                   Text(user["email"]),
                   Text(user["dob"] ?? "No birth date provided"),
                   Text(user["bio"] ?? "No bio available"),
+                  const Divider(),
+
+                  // Display the list of followed users
+                  FutureBuilder<List<String>>(
+                    future: getFollowingUsers(),
+                    builder: (context, followingSnapshot) {
+                      if (followingSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      }
+                      if (followingSnapshot.hasError) {
+                        return const Text("Error fetching followed users.");
+                      }
+                      if (followingSnapshot.hasData) {
+                        List<String> followedUsers = followingSnapshot.data!;
+                        return Column(
+                          children: [
+                            const Text("Following Users:"),
+                            for (var followedUser in followedUsers)
+                              Text(
+                                  followedUser), // Displaying followed user's email or username
+                          ],
+                        );
+                      }
+                      return const Text("No users followed.");
+                    },
+                  ),
+
                   const Divider(),
                   if (!isEditing)
                     ElevatedButton(
