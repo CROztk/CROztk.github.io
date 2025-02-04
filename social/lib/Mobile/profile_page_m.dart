@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:social/components/my_appbar.dart';
+import 'package:social/components/my_photo_post.dart';
+import 'package:social/components/my_text_post.dart';
 import 'package:social/components/my_textfield.dart';
 import 'package:social/database/firestore.dart';
 import 'package:social/database/storage.dart';
@@ -23,6 +25,7 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
   TextEditingController nameController = TextEditingController();
   Timestamp dobTimestamp = Timestamp.now();
   bool isEditing = false;
+  bool isTextPostTab = true;
 
   // all user information fields
   // username, email, dob, bio, following, followers
@@ -257,8 +260,53 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
                       ),
                     ),
                   const Divider(),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => setState(() => isTextPostTab = true),
+                          child: Container(
+                            margin: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: isTextPostTab
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Colors.grey,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text("Text Posts",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: isTextPostTab
+                                        ? Colors.white
+                                        : Colors.black)),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => setState(() => isTextPostTab = false),
+                          child: Container(
+                            margin: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                color: isTextPostTab
+                                    ? Colors.grey
+                                    : Theme.of(context).colorScheme.primary,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Text("Image Posts",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: isTextPostTab
+                                        ? Colors.black
+                                        : Colors.white)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                   StreamBuilder(
-                    stream: fireStore.getUserPosts(email),
+                    stream: isTextPostTab
+                        ? fireStore.getUserPosts(email)
+                        : fireStore.getUserPhotoPosts(email),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
@@ -277,33 +325,13 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
                           child: ListView.builder(
                             itemCount: posts.length,
                             itemBuilder: (context, index) {
-                              Timestamp timestamp = posts[index]["timestamp"];
-                              String username = posts[index]["username"];
-                              String message = posts[index]["message"];
-                              if (username != username) {
-                                return const SizedBox();
-                              }
-                              return ListTile(
-                                title: Text(message),
-                                subtitle: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(username),
-                                    Text(timestamp
-                                        .toDate()
-                                        .toString()
-                                        .substring(0, 16)),
-                                  ],
-                                ),
-                                trailing: IconButton(
-                                  icon: const Icon(Icons.delete),
-                                  onPressed: () {
-                                    fireStore.deletePost(posts[index].id);
-                                    setState(() {});
-                                  },
-                                ),
-                              );
+                              return isTextPostTab
+                                  ? MyTextPost(
+                                      post: posts[index],
+                                    )
+                                  : MyPhotoPost(
+                                      post: posts[index],
+                                    );
                             },
                           ),
                         );
