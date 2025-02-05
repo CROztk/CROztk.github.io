@@ -162,7 +162,7 @@ class _MyRegisterPageMobileState extends State<MyRegisterPageMobile> {
         "followers": [],
         "following": [],
         "bio": "",
-        "dob": "",
+        "dob": Timestamp.now(),
       };
 
       // save user document to the database

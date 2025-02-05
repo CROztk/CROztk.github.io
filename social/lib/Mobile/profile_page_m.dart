@@ -45,7 +45,9 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
     // set the user details
     username = userDetails['username'];
     email = userDetails['email'];
-    dob = userDetails['dob'].toString().substring(0, 10);
+    dob = userDetails["dob"].toString().isEmpty
+        ? ""
+        : userDetails['dob'].toString().substring(0, 10);
     bio = userDetails['bio'];
     following = List<String>.from(userDetails['following'] ?? []);
     followers = List<String>.from(userDetails['followers'] ?? []);
@@ -108,6 +110,7 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
+            print(snapshot.error);
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: const [

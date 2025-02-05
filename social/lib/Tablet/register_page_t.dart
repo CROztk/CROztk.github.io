@@ -154,7 +154,7 @@ class _MyRegisterPageTabletState extends State<MyRegisterPageTablet> {
         "followers": [],
         "following": [],
         "bio": "",
-        "dob": "",
+        "dob": Timestamp.now(),
       };
 
       // save user document to the database

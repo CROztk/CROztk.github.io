@@ -161,7 +161,7 @@ class _MyRegisterPageDesktopState extends State<MyRegisterPageDesktop> {
         "followers": [],
         "following": [],
         "bio": "",
-        "dob": "",
+        "dob": Timestamp.now(),
       };
 
       // save user document to the database

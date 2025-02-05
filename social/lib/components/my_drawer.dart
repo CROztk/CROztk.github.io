@@ -43,6 +43,10 @@ class _MyDrawerState extends State<MyDrawer> {
                     }
                     return const CircleAvatar(
                       radius: 50,
+                      child: Icon(
+                        Icons.account_circle,
+                        size: 100,
+                      ),
                     );
                   },
                 ),
