@@ -65,6 +65,9 @@ class _MyMainPageMobileState extends State<MyMainPageMobile> {
     // clear the textfield
     postController.clear();
 
+    // clear image
+    image = null;
+
     // close the dialog
     Navigator.pop(context);
 
@@ -85,132 +88,142 @@ class _MyMainPageMobileState extends State<MyMainPageMobile> {
       appBar: MyAppbar(title: "s o C I a l"),
       drawer: MyDrawer(),
       body: Center(
-        child: Column(children: [
-          SizedBox(height: 20),
-          Row(
-            children: [
-              SizedBox(width: 10),
-              Expanded(
-                child: TextField(
-                  controller: postController,
-                  decoration: InputDecoration(
-                    hintText: "What's on your mind?",
-                    border: OutlineInputBorder(),
-                    suffix: IconButton(
-                      icon: image == null
-                          ? Icon(Icons.image)
-                          : Icon(Icons.image_not_supported),
-                      onPressed: image == null
-                          ? selectImage
-                          : () {
-                              image = null;
-                              setState(() {});
-                            },
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            Column(children: [
+              SizedBox(height: 20),
+              Row(
+                children: [
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: TextField(
+                      textAlignVertical: TextAlignVertical.center,
+                      controller: postController,
+                      style: const TextStyle(fontSize: 20),
+                      decoration: InputDecoration(
+                        hintText: "What's on your mind?",
+                        hintStyle: const TextStyle(fontSize: 24),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30)),
+                        suffix: IconButton(
+                          iconSize: 16,
+                          icon: image == null
+                              ? Icon(Icons.image)
+                              : Icon(Icons.image_not_supported),
+                          onPressed: image == null
+                              ? selectImage
+                              : () {
+                                  image = null;
+                                  setState(() {});
+                                },
+                        ),
+                      ),
+                      onChanged: (value) {
+                        if (value.length < 2) {
+                          setState(() {});
+                        }
+                      },
                     ),
                   ),
-                  onChanged: (value) {
-                    if (value.length < 2) {
-                      setState(() {});
-                    }
-                  },
-                ),
+                  IconButton(
+                      onPressed:
+                          postController.text.isEmpty ? null : postMessage,
+                      icon: Icon(Icons.send)),
+                ],
               ),
-              IconButton(
-                  onPressed: postController.text.isEmpty ? null : postMessage,
-                  icon: Icon(Icons.send)),
-            ],
-          ),
+              StreamBuilder(
+                stream: isTextPostTab
+                    ? fireStore.getPosts()
+                    : fireStore.getPhotoPosts(),
+                builder: (context, snapshot) {
+                  // loading
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  // error
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Column(
+                        children: [
+                          const Icon(Icons.error, size: 80),
+                          Text("Something went wrong"),
+                        ],
+                      ),
+                    );
+                  }
+                  // success
+                  if (snapshot.hasData) {
+                    // extract data
+                    final posts = snapshot.data!.docs;
 
-          // Text and Image Posts tabs
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => setState(() => isTextPostTab = true),
-                  child: Container(
-                    margin: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: isTextPostTab
-                          ? Theme.of(context).colorScheme.primary
-                          : Colors.grey,
-                      borderRadius: BorderRadius.circular(10),
+                    return Expanded(
+                      child: ListView.builder(
+                        itemCount: posts.length,
+                        itemBuilder: (context, index) {
+                          return isTextPostTab
+                              ? MyTextPost(post: posts[index])
+                              : MyPhotoPost(post: posts[index]);
+                        },
+                      ),
+                    );
+                  }
+                  // no data
+                  return Center(
+                    child: Column(
+                      children: [
+                        const Icon(Icons.error, size: 80),
+                        Text("No posts found"),
+                      ],
                     ),
-                    child: Text("Text Posts",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color:
-                                isTextPostTab ? Colors.white : Colors.black)),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => setState(() => isTextPostTab = false),
-                  child: Container(
-                    margin: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
+                  );
+                },
+              )
+            ]),
+            // Text and Image Posts tabs
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () => setState(() => isTextPostTab = true),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
                         color: isTextPostTab
-                            ? Colors.grey
-                            : Theme.of(context).colorScheme.primary,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Text("Image Posts",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color:
-                                isTextPostTab ? Colors.black : Colors.white)),
+                            ? Theme.of(context).colorScheme.primary
+                            : Colors.grey,
+                        borderRadius: BorderRadius.horizontal(
+                          left: Radius.circular(30),
+                        ),
+                      ),
+                      child: Text("Text Posts",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white)),
+                    ),
                   ),
-                ),
+                  GestureDetector(
+                    onTap: () => setState(() => isTextPostTab = false),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          color: isTextPostTab
+                              ? Colors.grey
+                              : Theme.of(context).colorScheme.primary,
+                          borderRadius: BorderRadius.horizontal(
+                            right: Radius.circular(30),
+                          )),
+                      child: Text("Image Posts",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-          StreamBuilder(
-            stream: isTextPostTab
-                ? fireStore.getPosts()
-                : fireStore.getPhotoPosts(),
-            builder: (context, snapshot) {
-              // loading
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              // error
-              if (snapshot.hasError) {
-                return Center(
-                  child: Column(
-                    children: [
-                      const Icon(Icons.error, size: 80),
-                      Text("Something went wrong"),
-                    ],
-                  ),
-                );
-              }
-              // success
-              if (snapshot.hasData) {
-                // extract data
-                final posts = snapshot.data!.docs;
-
-                return Expanded(
-                  child: ListView.builder(
-                    itemCount: posts.length,
-                    itemBuilder: (context, index) {
-                      return isTextPostTab
-                          ? MyTextPost(post: posts[index])
-                          : MyPhotoPost(post: posts[index]);
-                    },
-                  ),
-                );
-              }
-              // no data
-              return Center(
-                child: Column(
-                  children: [
-                    const Icon(Icons.error, size: 80),
-                    Text("No posts found"),
-                  ],
-                ),
-              );
-            },
-          )
-        ]),
+            ),
+          ],
+        ),
       ),
     );
   }

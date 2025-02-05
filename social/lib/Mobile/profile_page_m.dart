@@ -100,7 +100,7 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MyAppbar(title: "Profile"),
+      appBar: MyAppbar(title: "P R O F I L E"),
       body: FutureBuilder(
         future: loadUserDetails(),
         builder: (context, snapshot) {
@@ -123,227 +123,274 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
             dobTimestamp = user?['dob'] ?? Timestamp.now();
 
             return Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+              child: Stack(
+                alignment: Alignment.bottomCenter,
                 children: [
-                  Stack(
-                    alignment: Alignment.center,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      FutureBuilder(
-                        future: storage.getImage(
-                            "profile_photos/", "${currentUser!.email!}.png"),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return CircleAvatar(
-                              radius: 45,
-                              backgroundImage:
-                                  NetworkImage(snapshot.data.toString()),
-                            );
-                          }
-                          return const Icon(Icons.face, size: 80);
-                        },
-                      ),
-                      SizedBox(
-                        height: 110,
-                        width: 110,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            IconButton(
-                              onPressed: _changeProfilePicture,
-                              icon: const Icon(Icons.edit),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    username,
-                    style: const TextStyle(
-                        fontSize: 32, fontWeight: FontWeight.bold),
-                  ),
-                  Text(email),
-                  Text(dobTimestamp.toDate().toString().substring(0, 10)),
-                  Text(bio),
-                  const Divider(),
-
-                  // Display the list of followed users
-                  FutureBuilder<List<String>>(
-                    future: getFollowingUsers(),
-                    builder: (context, followingSnapshot) {
-                      if (followingSnapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      }
-                      if (followingSnapshot.hasError) {
-                        return const Text("Error fetching followed users.");
-                      }
-                      if (followingSnapshot.hasData) {
-                        return Column(
-                          children: [
-                            Text(
-                                "Following Users: ${following.length}, Followers: ${followers.length}"), // Displaying number of followed users
-                          ],
-                        );
-                      }
-                      return const Text("No users followed.");
-                    },
-                  ),
-
-                  const Divider(),
-                  if (!isEditing)
-                    ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          isEditing = true;
-                        });
-                      },
-                      child: const Text("Edit Profile"),
-                    )
-                  else
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
+                      Stack(
+                        alignment: Alignment.center,
                         children: [
-                          MyTextfield(
-                              text: "Edit Username",
-                              obscureText: false,
-                              controller: nameController),
-                          const SizedBox(height: 10),
-                          TextButton(
-                              onPressed: () {
-                                showDatePicker(
-                                  context: context,
-                                  initialDate:
-                                      DateTime(DateTime.now().year - 18),
-                                  firstDate: DateTime(1900),
-                                  lastDate: DateTime(DateTime.now().year - 18),
-                                ).then((value) {
-                                  if (value != null) {
-                                    dobTimestamp = Timestamp.fromDate(value);
-                                  }
-                                });
-                              },
-                              child: Text(dobTimestamp
-                                  .toDate()
-                                  .toString()
-                                  .substring(0, 10))),
-                          const SizedBox(height: 10),
-                          TextFormField(
-                            controller: bioController,
-                            maxLines: 3,
-                            decoration: const InputDecoration(
-                              labelText: 'Edit Bio',
-                              border: OutlineInputBorder(),
+                          FutureBuilder(
+                            future: storage.getImage("profile_photos/",
+                                "${currentUser!.email!}.png"),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                      width: 5,
+                                    ),
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: 55,
+                                    backgroundImage:
+                                        NetworkImage(snapshot.data.toString()),
+                                  ),
+                                );
+                              }
+                              return const Icon(Icons.face, size: 110);
+                            },
+                          ),
+                          SizedBox(
+                            height: 130,
+                            width: 130,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                IconButton(
+                                  onPressed: _changeProfilePicture,
+                                  icon: const Icon(Icons.edit),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 10),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        ],
+                      ),
+                      Text(
+                        username,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.secondary,
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                          "@${email.split("@")[0]} 🎈 ${dobTimestamp.toDate().toString().substring(0, 10)}",
+                          style: TextStyle(
+                              fontSize: 10,
+                              color: Theme.of(context).colorScheme.onSurface)),
+                      Text(bio,
+                          style: TextStyle(
+                              fontSize: 18,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.5))),
+
+                      // Display the number of followed users and followers
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Column(
                             children: [
-                              ElevatedButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      isEditing = false;
-                                    });
-                                  },
-                                  child: const Text("Cancel")),
-                              ElevatedButton(
-                                onPressed: _saveProfile,
-                                child: const Text("Save Profile"),
+                              Text(
+                                following.length.toString(),
+                                style: const TextStyle(
+                                    fontSize: 22, fontWeight: FontWeight.bold),
                               ),
+                              Text("Following",
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withValues(alpha: 0.5))),
+                            ],
+                          ),
+                          Container(
+                            height: 30,
+                            width: 1,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          Column(
+                            children: [
+                              Text(followers.length.toString(),
+                                  style: const TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold)),
+                              Text("Followers",
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withValues(alpha: 0.5))),
                             ],
                           ),
                         ],
                       ),
-                    ),
-                  const Divider(),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: GestureDetector(
+
+                      const Divider(),
+                      if (!isEditing)
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              isEditing = true;
+                            });
+                          },
+                          child: const Text("Edit Profile"),
+                        )
+                      else
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              TextButton(
+                                  onPressed: () {
+                                    showDatePicker(
+                                      context: context,
+                                      initialDate:
+                                          DateTime(DateTime.now().year - 18),
+                                      firstDate: DateTime(1900),
+                                      lastDate:
+                                          DateTime(DateTime.now().year - 18),
+                                    ).then((value) {
+                                      if (value != null) {
+                                        dobTimestamp =
+                                            Timestamp.fromDate(value);
+                                      }
+                                    });
+                                  },
+                                  child: Text(dobTimestamp
+                                      .toDate()
+                                      .toString()
+                                      .substring(0, 10))),
+                              const SizedBox(height: 10),
+                              MyTextfield(
+                                  text: "Edit Username",
+                                  obscureText: false,
+                                  controller: nameController),
+                              const SizedBox(height: 10),
+                              TextFormField(
+                                controller: bioController,
+                                maxLines: 3,
+                                decoration: const InputDecoration(
+                                  labelText: 'Edit Bio',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  ElevatedButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          isEditing = false;
+                                        });
+                                      },
+                                      child: const Text("Cancel")),
+                                  ElevatedButton(
+                                    onPressed: _saveProfile,
+                                    child: const Text("Save Profile"),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      const Divider(),
+
+                      StreamBuilder(
+                        stream: isTextPostTab
+                            ? fireStore.getUserPosts(email)
+                            : fireStore.getUserPhotoPosts(email),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+                          if (snapshot.hasError) {
+                            return Column(
+                              children: const [
+                                Icon(Icons.error, size: 80),
+                                Text("Something went wrong"),
+                              ],
+                            );
+                          }
+                          if (snapshot.hasData) {
+                            final posts = snapshot.data!.docs;
+                            return Expanded(
+                              child: ListView.builder(
+                                itemCount: posts.length,
+                                itemBuilder: (context, index) {
+                                  return isTextPostTab
+                                      ? MyTextPost(
+                                          post: posts[index],
+                                        )
+                                      : MyPhotoPost(
+                                          post: posts[index],
+                                        );
+                                },
+                              ),
+                            );
+                          }
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(Icons.face_retouching_off, size: 80),
+                              Text("No data"),
+                            ],
+                          );
+                        },
+                      )
+                    ],
+                  ), // Text and Image Posts tabs
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GestureDetector(
                           onTap: () => setState(() => isTextPostTab = true),
                           child: Container(
-                            margin: const EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               color: isTextPostTab
                                   ? Theme.of(context).colorScheme.primary
                                   : Colors.grey,
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.horizontal(
+                                left: Radius.circular(30),
+                              ),
                             ),
                             child: Text("Text Posts",
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: isTextPostTab
-                                        ? Colors.white
-                                        : Colors.black)),
+                                style: TextStyle(color: Colors.white)),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        child: GestureDetector(
+                        GestureDetector(
                           onTap: () => setState(() => isTextPostTab = false),
                           child: Container(
-                            margin: const EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                                 color: isTextPostTab
                                     ? Colors.grey
                                     : Theme.of(context).colorScheme.primary,
-                                borderRadius: BorderRadius.circular(10)),
+                                borderRadius: BorderRadius.horizontal(
+                                  right: Radius.circular(30),
+                                )),
                             child: Text("Image Posts",
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: isTextPostTab
-                                        ? Colors.black
-                                        : Colors.white)),
+                                style: TextStyle(color: Colors.white)),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  StreamBuilder(
-                    stream: isTextPostTab
-                        ? fireStore.getUserPosts(email)
-                        : fireStore.getUserPhotoPosts(email),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      if (snapshot.hasError) {
-                        return Column(
-                          children: const [
-                            Icon(Icons.error, size: 80),
-                            Text("Something went wrong"),
-                          ],
-                        );
-                      }
-                      if (snapshot.hasData) {
-                        final posts = snapshot.data!.docs;
-                        return Expanded(
-                          child: ListView.builder(
-                            itemCount: posts.length,
-                            itemBuilder: (context, index) {
-                              return isTextPostTab
-                                  ? MyTextPost(
-                                      post: posts[index],
-                                    )
-                                  : MyPhotoPost(
-                                      post: posts[index],
-                                    );
-                            },
-                          ),
-                        );
-                      }
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.face_retouching_off, size: 80),
-                          Text("No data"),
-                        ],
-                      );
-                    },
+                      ],
+                    ),
                   )
                 ],
               ),

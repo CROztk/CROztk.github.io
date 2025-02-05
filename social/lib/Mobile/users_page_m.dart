@@ -44,7 +44,7 @@ class _MyUsersPageMobileState extends State<MyUsersPageMobile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Users"),
+        title: const Text("U S E R S"),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance

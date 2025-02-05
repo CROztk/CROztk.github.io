@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:social/database/storage.dart';
 
 class MyDrawer extends StatefulWidget {
-  const MyDrawer({super.key});
+  const MyDrawer({super.key, this.popDrawer = true});
+  final bool popDrawer;
 
   @override
   State<MyDrawer> createState() => _MyDrawerState();
@@ -57,7 +58,7 @@ class _MyDrawerState extends State<MyDrawer> {
             leading: Icon(Icons.home,
                 color: Theme.of(context).colorScheme.onSurface),
             onTap: () {
-              Navigator.pop(context);
+              widget.popDrawer ? Navigator.pop(context) : null;
             },
           ),
 
@@ -68,7 +69,7 @@ class _MyDrawerState extends State<MyDrawer> {
                 color: Theme.of(context).colorScheme.onSurface),
             onTap: () {
               // pop drawer
-              Navigator.pop(context);
+              widget.popDrawer ? Navigator.pop(context) : null;
 
               // navigate to profile page
               Navigator.pushNamed(context, '/profile');
@@ -78,11 +79,11 @@ class _MyDrawerState extends State<MyDrawer> {
           // users tile
           ListTile(
             title: const Text('U S E R S'),
-            leading: Icon(Icons.person,
+            leading: Icon(Icons.people,
                 color: Theme.of(context).colorScheme.onSurface),
             onTap: () {
               // pop drawer
-              Navigator.pop(context);
+              widget.popDrawer ? Navigator.pop(context) : null;
 
               // navigate to users page
               Navigator.pushNamed(context, '/users');
@@ -95,7 +96,7 @@ class _MyDrawerState extends State<MyDrawer> {
             leading: Icon(Icons.logout,
                 color: Theme.of(context).colorScheme.onSurface),
             onTap: () {
-              Navigator.pop(context);
+              widget.popDrawer ? Navigator.pop(context) : null;
               FirebaseAuth.instance.signOut();
             },
           ),

@@ -87,8 +87,7 @@ class FireStoreDatabase {
     final imageURL = postData["imageURL"];
     if (imageURL.isNotEmpty) {
       // delete image from storage
-      final name = imageURL.split("/").last;
-      FirebaseStorage.instance.ref().child("photoPosts/$name").delete();
+      FirebaseStorage.instance.refFromURL(imageURL).delete();
     }
     await photoPosts.doc(id).delete();
   }

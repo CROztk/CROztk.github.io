@@ -130,6 +130,10 @@ class _MyRegisterPageDesktopState extends State<MyRegisterPageDesktop> {
       Map<String, dynamic> user = {
         "email": userCredential.user!.email,
         "username": _usernameController.text,
+        "followers": [],
+        "following": [],
+        "bio": "",
+        "dob": "",
       };
 
       // save user document to the database
@@ -145,61 +149,64 @@ class _MyRegisterPageDesktopState extends State<MyRegisterPageDesktop> {
     return Scaffold(
       appBar: MyAppbar(title: "s o C I a l"),
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(50.0), // Increased padding for desktop
-          child: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 600), // Limit the width
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.phone_android,
-                    size: 120, // Increased icon size for desktop
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                  SizedBox(height: 40), // Increased spacing
-                  MyTextfield(
-                      text: "Username",
-                      obscureText: false,
-                      controller: _usernameController),
-                  SizedBox(height: 20),
-                  MyTextfield(
-                      text: "Email",
-                      obscureText: false,
-                      controller: _emailController),
-                  SizedBox(height: 20),
-                  MyTextfield(
-                      text: "Password",
-                      obscureText: true,
-                      controller: _passwordController),
-                  SizedBox(height: 20),
-                  MyTextfield(
-                      text: "Confirm Password",
-                      obscureText: true,
-                      controller: _passwordCheckController),
-                  SizedBox(height: 30), // Increased spacing
-                  MyElevatedButton(
-                      text: "Create Account",
-                      onPressed: () {
-                        _register();
-                      }),
-                  SizedBox(height: 30), // Increased spacing
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Already have an account?"),
-                      GestureDetector(
-                        onTap: widget.onTap,
-                        child: const Text(
-                          " Let's login!",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding:
+                const EdgeInsets.all(50.0), // Increased padding for desktop
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: 600), // Limit the width
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.phone_android,
+                      size: 120, // Increased icon size for desktop
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    SizedBox(height: 40), // Increased spacing
+                    MyTextfield(
+                        text: "Username",
+                        obscureText: false,
+                        controller: _usernameController),
+                    SizedBox(height: 20),
+                    MyTextfield(
+                        text: "Email",
+                        obscureText: false,
+                        controller: _emailController),
+                    SizedBox(height: 20),
+                    MyTextfield(
+                        text: "Password",
+                        obscureText: true,
+                        controller: _passwordController),
+                    SizedBox(height: 20),
+                    MyTextfield(
+                        text: "Confirm Password",
+                        obscureText: true,
+                        controller: _passwordCheckController),
+                    SizedBox(height: 30), // Increased spacing
+                    MyElevatedButton(
+                        text: "Create Account",
+                        onPressed: () {
+                          _register();
+                        }),
+                    SizedBox(height: 30), // Increased spacing
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Already have an account?"),
+                        GestureDetector(
+                          onTap: widget.onTap,
+                          child: const Text(
+                            " Let's login!",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

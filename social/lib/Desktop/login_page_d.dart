@@ -80,51 +80,54 @@ class _MyLoginPageDesktopState extends State<MyLoginPageDesktop> {
     return Scaffold(
       appBar: MyAppbar(title: "s o C I a l"),
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(50.0), // Increased padding for desktop
-          child: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 500), // Limit the width
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.phone_android,
-                    size: 150, // Increased icon size for desktop
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                  SizedBox(height: 40), // Increased spacing
-                  MyTextfield(
-                      text: "Email",
-                      obscureText: false,
-                      controller: _emailController),
-                  SizedBox(height: 20),
-                  MyTextfield(
-                      text: "Password",
-                      obscureText: true,
-                      controller: _passwordController),
-                  SizedBox(height: 30), // Increased spacing
-                  MyElevatedButton(
-                      text: "Login",
-                      onPressed: () {
-                        _login();
-                      }),
-                  SizedBox(height: 30), // Increased spacing
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Don't have an account?"),
-                      GestureDetector(
-                        onTap: widget.onTap,
-                        child: const Text(
-                          " Let's register!",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding:
+                const EdgeInsets.all(50.0), // Increased padding for desktop
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: 500), // Limit the width
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.phone_android,
+                      size: 150, // Increased icon size for desktop
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    SizedBox(height: 40), // Increased spacing
+                    MyTextfield(
+                        text: "Email",
+                        obscureText: false,
+                        controller: _emailController),
+                    SizedBox(height: 20),
+                    MyTextfield(
+                        text: "Password",
+                        obscureText: true,
+                        controller: _passwordController),
+                    SizedBox(height: 30), // Increased spacing
+                    MyElevatedButton(
+                        text: "Login",
+                        onPressed: () {
+                          _login();
+                        }),
+                    SizedBox(height: 30), // Increased spacing
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Don't have an account?"),
+                        GestureDetector(
+                          onTap: widget.onTap,
+                          child: const Text(
+                            " Let's register!",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

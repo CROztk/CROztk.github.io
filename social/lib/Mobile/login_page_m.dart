@@ -80,48 +80,50 @@ class _MyLoginPageMobileState extends State<MyLoginPageMobile> {
     return Scaffold(
       appBar: MyAppbar(title: "s o C I a l"),
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.phone_android,
-                size: 80,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              SizedBox(height: 30),
-              MyTextfield(
-                  text: "Email",
-                  obscureText: false,
-                  controller: _emailController),
-              SizedBox(height: 10),
-              MyTextfield(
-                  text: "Password",
-                  obscureText: true,
-                  controller: _passwordController),
-              SizedBox(height: 10),
-              MyElevatedButton(
-                  text: "Login",
-                  onPressed: () {
-                    _login();
-                  }),
-              SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Don't have an account?"),
-                  GestureDetector(
-                    onTap: widget.onTap,
-                    child: const Text(
-                      " Let's register!",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.phone_android,
+                  size: 80,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                SizedBox(height: 30),
+                MyTextfield(
+                    text: "Email",
+                    obscureText: false,
+                    controller: _emailController),
+                SizedBox(height: 10),
+                MyTextfield(
+                    text: "Password",
+                    obscureText: true,
+                    controller: _passwordController),
+                SizedBox(height: 10),
+                MyElevatedButton(
+                    text: "Login",
+                    onPressed: () {
+                      _login();
+                    }),
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Don't have an account?"),
+                    GestureDetector(
+                      onTap: widget.onTap,
+                      child: const Text(
+                        " Let's register!",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

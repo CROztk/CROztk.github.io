@@ -1,7 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:social/components/my_appbar.dart';
+import 'package:social/components/my_drawer.dart';
+import 'package:social/components/my_photo_post.dart';
+import 'package:social/components/my_text_post.dart';
 import 'package:social/database/firestore.dart';
+import 'package:social/database/storage.dart';
 
 class MyMainPageDesktop extends StatefulWidget {
   const MyMainPageDesktop({super.key});
@@ -11,149 +17,227 @@ class MyMainPageDesktop extends StatefulWidget {
 }
 
 class _MyMainPageDesktopState extends State<MyMainPageDesktop> {
+// text controller for post
   final TextEditingController postController = TextEditingController();
+
+  // firestore access
   final FireStoreDatabase fireStore = FireStoreDatabase();
 
-  // Post message function
-  void postMessage() {
-    fireStore.addPost(postController.text);
+  // storage access
+  final Storage storage = Storage();
+
+  // tab selector
+  bool isTextPostTab = true;
+
+  // image to upload
+  XFile? image;
+
+  // post the message
+  void postMessage() async {
+    // check if the message is empty
+    if (postController.text.isEmpty && image == null) {
+      return;
+    }
+
+    // show circular progress indicator dialog
+    showDialog(
+      context: context,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+
+    // add post to firestore
+    if (image != null) {
+      String name = FirebaseAuth.instance.currentUser!.email! +
+          Timestamp.now().toString();
+      await storage.uploadImageXFile("photoPosts/", name, image!);
+      String url = await storage.getImage("photoPosts/", "$name.png");
+      if (url.isEmpty) {
+        Navigator.pop(context);
+        return;
+      }
+      await fireStore.addPhotoPost(postController.text, url);
+    } else {
+      await fireStore.addPost(postController.text);
+    }
+
+    // clear the textfield
     postController.clear();
+
+    // clear image
+    image = null;
+
+    // close the dialog
+    Navigator.pop(context);
+
+    // update the UI
+    setState(() {});
+  }
+
+  // select image
+  Future<void> selectImage() async {
+    final ImagePicker picker = ImagePicker();
+    image = await picker.pickImage(source: ImageSource.gallery);
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("s o C I a l"),
-        backgroundColor: Theme.of(context)
-            .colorScheme
-            .surface, // Match navbar background with the theme
-        actions: [
-          TextButton(
-            onPressed: () {
-              // Stay on the current page when Home is clicked
-            },
-            child: Text("Home",
-                style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 18)), // Larger text and light gray
-          ),
-          TextButton(
-            onPressed: () {
-              // Navigate to Profile page
-              Navigator.pushNamed(context, '/profile');
-            },
-            child: Text("Profile",
-                style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 18)), // Larger text and light gray
-          ),
-          TextButton(
-            onPressed: () {
-              // Navigate to Users page
-              Navigator.pushNamed(context, '/users');
-            },
-            child: Text("Users",
-                style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 18)), // Larger text and light gray
-          ),
-          TextButton(
-            onPressed: () {
-              // Logout and navigate to the login page
-              FirebaseAuth.instance.signOut();
-              Navigator.pushReplacementNamed(
-                  context, '/login'); // Navigate to login page after logout
-            },
-            child: Text("Logout",
-                style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 18)), // Larger text and light gray
-          ),
-        ],
-      ),
+      appBar: MyAppbar(title: "s o C I a l"),
       body: Center(
-        child: Column(
+        child: Row(
           children: [
-            SizedBox(height: 50),
-            Row(
-              children: [
-                SizedBox(width: 40),
-                Expanded(
-                  child: TextField(
-                    controller: postController,
-                    style: TextStyle(fontSize: 26),
-                    decoration: InputDecoration(
-                      hintText: "What's on your mind?",
-                      hintStyle: TextStyle(fontSize: 24),
-                      border: OutlineInputBorder(),
-                    ),
-                    onChanged: (value) {
-                      setState(() {});
-                    },
-                  ),
-                ),
-                IconButton(
-                  onPressed: postController.text.isEmpty ? null : postMessage,
-                  icon: Icon(Icons.send, size: 32),
-                ),
-                SizedBox(width: 40),
-              ],
+            MyDrawer(
+              popDrawer: false,
             ),
             Expanded(
-              child: StreamBuilder(
-                stream: fireStore.getPosts(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (snapshot.hasError) {
-                    return Center(
-                      child: Column(
-                        children: [
-                          const Icon(Icons.error, size: 120),
-                          Text("Something went wrong",
-                              style: TextStyle(fontSize: 26)),
-                        ],
-                      ),
-                    );
-                  }
-                  if (snapshot.hasData) {
-                    final posts = snapshot.data!.docs;
-                    return ListView.builder(
-                      itemCount: posts.length,
-                      itemBuilder: (context, index) {
-                        Timestamp timestamp = posts[index]["timestamp"];
-                        return ListTile(
-                          title: Text(
-                            posts[index]["message"],
-                            style: TextStyle(fontSize: 28),
-                          ),
-                          subtitle: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  Column(children: [
+                    SizedBox(height: 20),
+                    StreamBuilder(
+                      stream: isTextPostTab
+                          ? fireStore.getPosts()
+                          : fireStore.getPhotoPosts(),
+                      builder: (context, snapshot) {
+                        // loading
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+                        // error
+                        if (snapshot.hasError) {
+                          return Center(
+                            child: Column(
+                              children: [
+                                const Icon(Icons.error, size: 80),
+                                Text("Something went wrong"),
+                              ],
+                            ),
+                          );
+                        }
+                        // success
+                        if (snapshot.hasData) {
+                          // extract data
+                          final posts = snapshot.data!.docs;
+
+                          return Expanded(
+                            child: ListView.builder(
+                              itemCount: posts.length,
+                              itemBuilder: (context, index) {
+                                return isTextPostTab
+                                    ? MyTextPost(post: posts[index])
+                                    : MyPhotoPost(post: posts[index]);
+                              },
+                            ),
+                          );
+                        }
+                        // no data
+                        return Center(
+                          child: Column(
                             children: [
-                              Text(posts[index]["username"],
-                                  style: TextStyle(fontSize: 24)),
-                              Text(
-                                timestamp.toDate().toString().substring(0, 16),
-                                style: TextStyle(fontSize: 22),
-                              ),
+                              const Icon(Icons.error, size: 80),
+                              Text("No posts found"),
                             ],
                           ),
                         );
                       },
-                    );
-                  }
-                  return Center(
-                    child: Column(
+                    )
+                  ]),
+                  // Text and Image Posts tabs
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error, size: 120),
-                        Text("No posts found", style: TextStyle(fontSize: 26)),
+                        GestureDetector(
+                          onTap: () => setState(() => isTextPostTab = true),
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: isTextPostTab
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Colors.grey,
+                              borderRadius: BorderRadius.horizontal(
+                                left: Radius.circular(30),
+                              ),
+                            ),
+                            child: Text("Text Posts",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => setState(() => isTextPostTab = false),
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                color: isTextPostTab
+                                    ? Colors.grey
+                                    : Theme.of(context).colorScheme.primary,
+                                borderRadius: BorderRadius.horizontal(
+                                  right: Radius.circular(30),
+                                )),
+                            child: Text("Image Posts",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
                       ],
                     ),
-                  );
-                },
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Column(
+                children: [
+                  SizedBox(height: 50),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: TextField(
+                          textAlignVertical: TextAlignVertical.center,
+                          controller: postController,
+                          style: const TextStyle(fontSize: 20),
+                          decoration: InputDecoration(
+                            hintText: "What's on your mind?",
+                            hintStyle: const TextStyle(fontSize: 24),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30)),
+                            suffix: IconButton(
+                              iconSize: 16,
+                              icon: image == null
+                                  ? Icon(Icons.image)
+                                  : Icon(Icons.image_not_supported),
+                              onPressed: image == null
+                                  ? selectImage
+                                  : () {
+                                      image = null;
+                                      setState(() {});
+                                    },
+                            ),
+                          ),
+                          onChanged: (value) {
+                            if (value.length < 2) {
+                              setState(() {});
+                            }
+                          },
+                        ),
+                      ),
+                      IconButton(
+                          onPressed:
+                              postController.text.isEmpty ? null : postMessage,
+                          icon: Icon(Icons.send)),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],

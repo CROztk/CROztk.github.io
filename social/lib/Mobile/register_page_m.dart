@@ -130,6 +130,10 @@ class _MyRegisterPageMobileState extends State<MyRegisterPageMobile> {
       Map<String, dynamic> user = {
         "email": userCredential.user!.email,
         "username": _usernameController.text,
+        "followers": [],
+        "following": [],
+        "bio": "",
+        "dob": "",
       };
 
       // save user document to the database
@@ -145,57 +149,59 @@ class _MyRegisterPageMobileState extends State<MyRegisterPageMobile> {
     return Scaffold(
       appBar: MyAppbar(title: "s o C I a l"),
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.phone_android,
-                size: 80,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              SizedBox(height: 30),
-              MyTextfield(
-                  text: "Username",
-                  obscureText: false,
-                  controller: _usernameController),
-              SizedBox(height: 10),
-              MyTextfield(
-                  text: "Email",
-                  obscureText: false,
-                  controller: _emailController),
-              SizedBox(height: 10),
-              MyTextfield(
-                  text: "Password",
-                  obscureText: true,
-                  controller: _passwordController),
-              SizedBox(height: 10),
-              MyTextfield(
-                  text: "Confirm Password",
-                  obscureText: true,
-                  controller: _passwordCheckController),
-              SizedBox(height: 10),
-              MyElevatedButton(
-                  text: "Create Account",
-                  onPressed: () {
-                    _register();
-                  }),
-              SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Already have an account?"),
-                  GestureDetector(
-                    onTap: widget.onTap,
-                    child: const Text(
-                      " Let's login!",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.phone_android,
+                  size: 80,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                SizedBox(height: 30),
+                MyTextfield(
+                    text: "Username",
+                    obscureText: false,
+                    controller: _usernameController),
+                SizedBox(height: 10),
+                MyTextfield(
+                    text: "Email",
+                    obscureText: false,
+                    controller: _emailController),
+                SizedBox(height: 10),
+                MyTextfield(
+                    text: "Password",
+                    obscureText: true,
+                    controller: _passwordController),
+                SizedBox(height: 10),
+                MyTextfield(
+                    text: "Confirm Password",
+                    obscureText: true,
+                    controller: _passwordCheckController),
+                SizedBox(height: 10),
+                MyElevatedButton(
+                    text: "Create Account",
+                    onPressed: () {
+                      _register();
+                    }),
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Already have an account?"),
+                    GestureDetector(
+                      onTap: widget.onTap,
+                      child: const Text(
+                        " Let's login!",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
