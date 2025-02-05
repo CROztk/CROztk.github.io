@@ -32,6 +32,19 @@ class _MyMainPageDesktopState extends State<MyMainPageDesktop> {
   // image to upload
   XFile? image;
 
+  bool isUserAdmin = false;
+
+  // init state
+  @override
+  void initState() {
+    super.initState();
+    // check if user is admin
+    fireStore.isAdmin().then((value) {
+      isUserAdmin = value;
+      setState(() {});
+    });
+  }
+
   // post the message
   void postMessage() async {
     // check if the message is empty
@@ -130,8 +143,12 @@ class _MyMainPageDesktopState extends State<MyMainPageDesktop> {
                               itemCount: posts.length,
                               itemBuilder: (context, index) {
                                 return isTextPostTab
-                                    ? MyTextPost(post: posts[index])
-                                    : MyPhotoPost(post: posts[index]);
+                                    ? MyTextPost(
+                                        post: posts[index],
+                                        isUserAdmin: isUserAdmin)
+                                    : MyPhotoPost(
+                                        post: posts[index],
+                                        isUserAdmin: isUserAdmin);
                               },
                             ),
                           );

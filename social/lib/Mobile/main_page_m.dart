@@ -32,6 +32,20 @@ class _MyMainPageMobileState extends State<MyMainPageMobile> {
   // image to upload
   XFile? image;
 
+  bool isUserAdmin = false;
+
+  // init state
+  @override
+  void initState() {
+    super.initState();
+    // check if user is admin
+    fireStore.isAdmin().then((value) {
+      setState(() {
+        isUserAdmin = value;
+      });
+    });
+  }
+
   // post the message
   void postMessage() async {
     // check if the message is empty
@@ -162,8 +176,10 @@ class _MyMainPageMobileState extends State<MyMainPageMobile> {
                         itemCount: posts.length,
                         itemBuilder: (context, index) {
                           return isTextPostTab
-                              ? MyTextPost(post: posts[index])
-                              : MyPhotoPost(post: posts[index]);
+                              ? MyTextPost(
+                                  post: posts[index], isUserAdmin: isUserAdmin)
+                              : MyPhotoPost(
+                                  post: posts[index], isUserAdmin: isUserAdmin);
                         },
                       ),
                     );

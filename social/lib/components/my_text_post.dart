@@ -5,8 +5,9 @@ import 'package:social/database/firestore.dart';
 import 'package:social/database/storage.dart';
 
 class MyTextPost extends StatefulWidget {
-  MyTextPost({super.key, required this.post});
+  MyTextPost({super.key, required this.post, this.isUserAdmin = false});
   final post;
+  final bool isUserAdmin;
 
   @override
   State<MyTextPost> createState() => _MyTextPostState();
@@ -117,7 +118,7 @@ class _MyTextPostState extends State<MyTextPost> {
                       setState(() {});
                     },
                   ),
-                  email == fireStore.currentUser!.email
+                  (email == fireStore.currentUser!.email) || widget.isUserAdmin
                       ? IconButton(
                           icon: Icon(Icons.delete),
                           onPressed: () {

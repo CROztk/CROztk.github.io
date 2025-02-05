@@ -143,4 +143,18 @@ class FireStoreDatabase {
         .then((value) => value.data()!["username"]);
     return postData["username"] == currentUsername;
   }
+
+  Future<bool> isAdmin() {
+    return FirebaseFirestore.instance
+        .collection("adminList")
+        .doc(currentUser!.email)
+        .get()
+        .then((value) {
+      if (value.exists) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+  }
 }

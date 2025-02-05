@@ -87,6 +87,35 @@ class _MyRegisterPageMobileState extends State<MyRegisterPageMobile> {
       return;
     }
 
+    // check if username unique
+    QuerySnapshot query = await FirebaseFirestore.instance
+        .collection("users")
+        .where("username", isEqualTo: _usernameController.text)
+        .get();
+    if (query.docs.isNotEmpty) {
+      // close dialog
+      Navigator.of(context).pop();
+      // show error dialog
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Error"),
+            content: const Text("Username already exists"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
     // try to create account
     try {
       // create account

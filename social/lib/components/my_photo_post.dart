@@ -8,8 +8,9 @@ import 'package:social/database/firestore.dart';
 import 'package:social/database/storage.dart';
 
 class MyPhotoPost extends StatefulWidget {
-  const MyPhotoPost({super.key, required this.post});
+  const MyPhotoPost({super.key, required this.post, this.isUserAdmin = false});
   final post;
+  final bool isUserAdmin;
 
   @override
   State<MyPhotoPost> createState() => _MyPhotoPostState();
@@ -142,7 +143,7 @@ class _MyPhotoPostState extends State<MyPhotoPost> {
                         ),
                       ),
                     ),
-                    email == currentUser.email
+                    (email == currentUser.email || widget.isUserAdmin)
                         ? Container(
                             decoration: BoxDecoration(
                               boxShadow: [
