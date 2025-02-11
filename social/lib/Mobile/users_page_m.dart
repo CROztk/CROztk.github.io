@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:social/Theme/theme_notifier.dart';
+import 'package:social/components/my_appbar.dart';
 import 'package:social/components/my_user_card.dart';
 
 class MyUsersPageMobile extends StatefulWidget {
@@ -42,9 +45,11 @@ class _MyUsersPageMobileState extends State<MyUsersPageMobile> {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final currentLanguage = themeNotifier.currentLanguage;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("U S E R S"),
+      appBar: MyAppbar(
+        title: currentLanguage["users"] ?? "Users",
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -57,11 +62,15 @@ class _MyUsersPageMobileState extends State<MyUsersPageMobile> {
           }
 
           if (snapshot.hasError) {
-            return const Center(child: Text('Error loading users'));
+            return Center(
+                child: Text(currentLanguage["error loading users"] ??
+                    "Error loading users"));
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('No users found'));
+            return Center(
+                child: Text(
+                    currentLanguage["no users found"] ?? "No users found"));
           }
 
           var users = snapshot.data!.docs;

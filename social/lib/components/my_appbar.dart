@@ -11,15 +11,33 @@ class MyAppbar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final currentLanguage = themeNotifier.currentLanguage;
     return AppBar(
       title: Text(title),
       elevation: 1,
       actions: [
-        IconButton(
-          icon: const Icon(Icons.light_mode),
-          onPressed: () {
-            themeNotifier.toggleThemeMode();
-          },
+        Row(
+          children: [
+            IconButton(
+              icon: Row(
+                children: [
+                  Text("${currentLanguage["language"] ?? "en"}|"),
+                  const Icon(Icons.language),
+                ],
+              ),
+              padding: const EdgeInsets.all(8),
+              onPressed: () {
+                themeNotifier.setLanguage(
+                    currentLanguage["language"] == "en" ? "tr" : "en");
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.light_mode),
+              onPressed: () {
+                themeNotifier.toggleThemeMode();
+              },
+            ),
+          ],
         ),
       ],
       leading: leading,

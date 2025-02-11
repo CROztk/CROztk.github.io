@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:social/Theme/theme_notifier.dart';
 import 'package:social/components/my_appbar.dart';
 import 'package:social/database/firestore.dart';
 import 'package:social/database/storage.dart';
@@ -54,8 +56,13 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
       'dob': dobController.text,
     });
 
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final currentLanguage = themeNotifier.currentLanguage;
+
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Profile updated successfully!")),
+      SnackBar(
+          content: Text(currentLanguage["profile updated successfully!"] ??
+              "Profile updated successfully!")),
     );
 
     setState(() {
@@ -65,8 +72,10 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final currentLanguage = themeNotifier.currentLanguage;
     return Scaffold(
-      appBar: MyAppbar(title: "Profile"),
+      appBar: MyAppbar(title: currentLanguage["title"] ?? "s o C I a l"),
       body: FutureBuilder(
         future: getUserDetails(),
         builder: (context, snapshot) {
@@ -76,9 +85,10 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
           if (snapshot.hasError) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 Icon(Icons.error, size: 80),
-                Text("Something went wrong"),
+                Text(currentLanguage["something went wrong"] ??
+                    "Something went wrong"),
               ],
             );
           }
@@ -141,7 +151,8 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
                           isEditing = true;
                         });
                       },
-                      child: const Text("Edit Profile"),
+                      child: Text(
+                          currentLanguage["edit profile"] ?? "Edit Profile"),
                     ),
                   if (isEditing)
                     Padding(
@@ -150,8 +161,9 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
                         children: [
                           TextFormField(
                             controller: nameController,
-                            decoration: const InputDecoration(
-                              labelText: 'Edit Name',
+                            decoration: InputDecoration(
+                              labelText: currentLanguage["edit username"] ??
+                                  "Edit Username",
                               border: OutlineInputBorder(),
                             ),
                           ),
@@ -163,19 +175,21 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
                               border: OutlineInputBorder(),
                             ),
                           ),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           TextFormField(
                             controller: bioController,
                             maxLines: 3,
-                            decoration: const InputDecoration(
-                              labelText: 'Edit Bio',
+                            decoration: InputDecoration(
+                              labelText:
+                                  currentLanguage["edit bio"] ?? "Edit Bio",
                               border: OutlineInputBorder(),
                             ),
                           ),
                           const SizedBox(height: 10),
                           ElevatedButton(
                             onPressed: _saveProfile,
-                            child: const Text("Save Profile"),
+                            child: Text(currentLanguage["save profile"] ??
+                                "Save Profile"),
                           ),
                         ],
                       ),
@@ -189,9 +203,10 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
                       }
                       if (snapshot.hasError) {
                         return Column(
-                          children: const [
+                          children: [
                             Icon(Icons.error, size: 80),
-                            Text("Something went wrong"),
+                            Text(currentLanguage["something went wrong"] ??
+                                "Something went wrong"),
                           ],
                         );
                       }
@@ -234,9 +249,9 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
                       }
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           Icon(Icons.face_retouching_off, size: 80),
-                          Text("No data"),
+                          Text(currentLanguage["no data"] ?? "No data"),
                         ],
                       );
                     },
@@ -247,9 +262,9 @@ class _MyProfilePageMobileState extends State<MyProfilePageMobile> {
           }
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
+            children: [
               Icon(Icons.face_retouching_off, size: 80),
-              Text("No data"),
+              Text(currentLanguage["no data"] ?? "No data"),
             ],
           );
         },

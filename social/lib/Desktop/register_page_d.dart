@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:social/Theme/theme_notifier.dart';
 import 'package:social/components/my_appbar.dart';
 import 'package:social/components/my_elevated_button.dart';
 import 'package:social/components/my_textfield.dart';
@@ -174,8 +176,10 @@ class _MyRegisterPageDesktopState extends State<MyRegisterPageDesktop> {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final currentLanguage = themeNotifier.currentLanguage;
     return Scaffold(
-      appBar: MyAppbar(title: "s o C I a l"),
+      appBar: MyAppbar(title: currentLanguage["title"] ?? "s o C I a l"),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -195,27 +199,29 @@ class _MyRegisterPageDesktopState extends State<MyRegisterPageDesktop> {
                     ),
                     SizedBox(height: 40), // Increased spacing
                     MyTextfield(
-                        text: "Username",
+                        text: currentLanguage["username"] ?? "Username",
                         obscureText: false,
                         controller: _usernameController),
                     SizedBox(height: 20),
                     MyTextfield(
-                        text: "Email",
+                        text: currentLanguage["email"] ?? "Email",
                         obscureText: false,
                         controller: _emailController),
                     SizedBox(height: 20),
                     MyTextfield(
-                        text: "Password",
+                        text: currentLanguage["password"] ?? "Password",
                         obscureText: true,
                         controller: _passwordController),
                     SizedBox(height: 20),
                     MyTextfield(
-                        text: "Confirm Password",
+                        text: currentLanguage["confirm password"] ??
+                            "Confirm Password",
                         obscureText: true,
                         controller: _passwordCheckController),
                     SizedBox(height: 30), // Increased spacing
                     MyElevatedButton(
-                        text: "Create Account",
+                        text: currentLanguage["create account"] ??
+                            "Create Account",
                         onPressed: () {
                           _register();
                         }),
@@ -223,11 +229,12 @@ class _MyRegisterPageDesktopState extends State<MyRegisterPageDesktop> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Already have an account?"),
+                        Text(currentLanguage["already have an account?"] ??
+                            "Already have an account?"),
                         GestureDetector(
                           onTap: widget.onTap,
-                          child: const Text(
-                            " Let's login!",
+                          child: Text(
+                            currentLanguage["let's login!"] ?? " Let's login!",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),

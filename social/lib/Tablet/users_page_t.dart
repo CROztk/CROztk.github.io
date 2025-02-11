@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:social/Theme/theme_notifier.dart';
 import 'package:social/components/my_appbar.dart';
 
 class MyUsersPageTablet extends StatelessWidget {
@@ -12,9 +14,11 @@ class MyUsersPageTablet extends StatelessWidget {
     double usernameFontSize = screenWidth < 600 ? 22 : 24; // Larger for tablet
     double emailFontSize =
         screenWidth < 600 ? 18 : 20; // Slightly larger than mobile
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final currentLanguage = themeNotifier.currentLanguage;
 
     return Scaffold(
-      appBar: MyAppbar(title: "s o C I a l"),
+      appBar: MyAppbar(title: currentLanguage["title"] ?? "s o C I a l"),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection("users").snapshots(),
         builder: (context, snapshot) {
@@ -29,7 +33,10 @@ class MyUsersPageTablet extends StatelessWidget {
               child: Column(
                 children: [
                   const Icon(Icons.people_alt, size: 100),
-                  Text("Something went wrong"),
+                  Text(
+                      currentLanguage["something went wrong"] ??
+                          "Something went wrong",
+                      style: const TextStyle(fontSize: 22)),
                 ],
               ),
             );
@@ -78,7 +85,8 @@ class MyUsersPageTablet extends StatelessWidget {
             child: Column(
               children: [
                 const Icon(Icons.person, size: 100),
-                Text("No users found", style: const TextStyle(fontSize: 22)),
+                Text(currentLanguage["no users found"] ?? "No users found",
+                    style: const TextStyle(fontSize: 22)),
               ],
             ),
           );

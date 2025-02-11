@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:social/Responsive/dimensions.dart';
+import 'package:social/Theme/theme_notifier.dart';
 import 'package:social/database/storage.dart';
 
 class MyUserCard extends StatefulWidget {
@@ -100,6 +102,8 @@ class _MyUserCardState extends State<MyUserCard> {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final currentLanguage = themeNotifier.currentLanguage;
     // screen width multiplier
     double width = MediaQuery.of(context).size.width;
     double widthMultiplier = MediaQuery.of(context).size.width / 375;
@@ -161,10 +165,12 @@ class _MyUserCardState extends State<MyUserCard> {
                               Row(
                                 children: [
                                   Container(
-                                      child: Text("Followers: $followers")),
+                                      child: Text(
+                                          "${currentLanguage["followers"] ?? "Followers"}: $followers")),
                                   SizedBox(width: 10 * widthMultiplier),
                                   Container(
-                                      child: Text("Following: $following")),
+                                      child: Text(
+                                          "${currentLanguage["following"] ?? "Following"}: $following")),
                                 ],
                               ),
                               SizedBox(height: 10 * widthMultiplier),
@@ -173,19 +179,22 @@ class _MyUserCardState extends State<MyUserCard> {
                                       onPressed: () {
                                         _showUnfollowDialog(userEmail);
                                       },
-                                      child: const Text("Following"),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.blue,
                                       ),
+                                      child: Text(
+                                          currentLanguage["following"] ??
+                                              "Following"),
                                     )
                                   : ElevatedButton(
                                       onPressed: () {
                                         _followUser(userEmail);
                                       },
-                                      child: const Text("Follow"),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.green,
                                       ),
+                                      child: Text(currentLanguage["follow"] ??
+                                          "Follow"),
                                     ),
                             ],
                           )
@@ -199,9 +208,13 @@ class _MyUserCardState extends State<MyUserCard> {
                         children: [
                           Row(
                             children: [
-                              Container(child: Text("Followers: $followers")),
+                              Container(
+                                  child: Text(
+                                      "${currentLanguage["followers"] ?? "Followers"}: $followers")),
                               SizedBox(width: 10 * widthMultiplier),
-                              Container(child: Text("Following: $following")),
+                              Container(
+                                  child: Text(
+                                      "${currentLanguage["following"] ?? "Following"}: $following")),
                             ],
                           ),
                           SizedBox(height: 10 * widthMultiplier),
@@ -210,19 +223,22 @@ class _MyUserCardState extends State<MyUserCard> {
                                   onPressed: () {
                                     _showUnfollowDialog(userEmail);
                                   },
-                                  child: const Text("Following"),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.blue,
                                   ),
+                                  child: Text(
+                                      currentLanguage["following already"] ??
+                                          "Following"),
                                 )
                               : ElevatedButton(
                                   onPressed: () {
                                     _followUser(userEmail);
                                   },
-                                  child: const Text("Follow"),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.green,
                                   ),
+                                  child: Text(
+                                      currentLanguage["follow"] ?? "Follow"),
                                 ),
                         ],
                       )

@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:social/Theme/theme_notifier.dart';
 import 'package:social/components/my_appbar.dart';
 import 'package:social/components/my_elevated_button.dart';
 import 'package:social/components/my_textfield.dart';
@@ -22,6 +24,8 @@ class _MyRegisterPageMobileState extends State<MyRegisterPageMobile> {
 
   // login method
   void _register() async {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final currentLanguage = themeNotifier.currentLanguage;
     // loading circle
     showDialog(
       context: context,
@@ -41,14 +45,15 @@ class _MyRegisterPageMobileState extends State<MyRegisterPageMobile> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: const Text("Error"),
-            content: const Text("Passwords do not match"),
+            title: Text(currentLanguage["error"] ?? "Error"),
+            content: Text(currentLanguage["passwords do not match"] ??
+                "Passwords do not match"),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: const Text("OK"),
+                child: Text(currentLanguage["ok"] ?? "OK"),
               ),
             ],
           );
@@ -71,14 +76,14 @@ class _MyRegisterPageMobileState extends State<MyRegisterPageMobile> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: const Text("Error"),
-            content: const Text("Invalid email"),
+            title: Text(currentLanguage["error"] ?? "Error"),
+            content: Text(currentLanguage["invalid email"] ?? "Invalid email"),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: const Text("OK"),
+                child: Text(currentLanguage["ok"] ?? "OK"),
               ),
             ],
           );
@@ -100,14 +105,15 @@ class _MyRegisterPageMobileState extends State<MyRegisterPageMobile> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: const Text("Error"),
-            content: const Text("Username already exists"),
+            title: Text(currentLanguage["error"] ?? "Error"),
+            content: Text(currentLanguage["username already exists"] ??
+                "Username already exists"),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: const Text("OK"),
+                child: Text(currentLanguage["ok"] ?? "OK"),
               ),
             ],
           );
@@ -137,14 +143,14 @@ class _MyRegisterPageMobileState extends State<MyRegisterPageMobile> {
         builder: (context) {
           String text = e.toString().split("]")[1].trim();
           return AlertDialog(
-            title: const Text("Error"),
+            title: Text(currentLanguage["error"] ?? "Error"),
             content: Text(text),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: const Text("OK"),
+                child: Text(currentLanguage["ok"] ?? "OK"),
               ),
             ],
           );
@@ -175,8 +181,10 @@ class _MyRegisterPageMobileState extends State<MyRegisterPageMobile> {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final currentLanguage = themeNotifier.currentLanguage;
     return Scaffold(
-      appBar: MyAppbar(title: "s o C I a l"),
+      appBar: MyAppbar(title: currentLanguage["title"] ?? "s o C I a l"),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -191,27 +199,28 @@ class _MyRegisterPageMobileState extends State<MyRegisterPageMobile> {
                 ),
                 SizedBox(height: 30),
                 MyTextfield(
-                    text: "Username",
+                    text: currentLanguage["username"] ?? "Username",
                     obscureText: false,
                     controller: _usernameController),
                 SizedBox(height: 10),
                 MyTextfield(
-                    text: "Email",
+                    text: currentLanguage["email"] ?? "Email",
                     obscureText: false,
                     controller: _emailController),
                 SizedBox(height: 10),
                 MyTextfield(
-                    text: "Password",
+                    text: currentLanguage["password"] ?? "Password",
                     obscureText: true,
                     controller: _passwordController),
                 SizedBox(height: 10),
                 MyTextfield(
-                    text: "Confirm Password",
+                    text: currentLanguage["confirm password"] ??
+                        "Confirm Password",
                     obscureText: true,
                     controller: _passwordCheckController),
                 SizedBox(height: 10),
                 MyElevatedButton(
-                    text: "Create Account",
+                    text: currentLanguage["create account"] ?? "Create Account",
                     onPressed: () {
                       _register();
                     }),
@@ -219,11 +228,12 @@ class _MyRegisterPageMobileState extends State<MyRegisterPageMobile> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Already have an account?"),
+                    Text(currentLanguage["already have an account?"] ??
+                        "Already have an account?"),
                     GestureDetector(
                       onTap: widget.onTap,
-                      child: const Text(
-                        " Let's login!",
+                      child: Text(
+                        currentLanguage["let's login!"] ?? " Let's login!",
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),

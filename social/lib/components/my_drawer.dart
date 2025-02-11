@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:social/Theme/theme_notifier.dart';
 import 'package:social/database/storage.dart';
 
 class MyDrawer extends StatefulWidget {
@@ -15,6 +17,8 @@ class _MyDrawerState extends State<MyDrawer> {
   final storage = Storage();
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final currentLanguage = themeNotifier.currentLanguage;
     return Drawer(
       child: ListView(
         children: [
@@ -58,7 +62,7 @@ class _MyDrawerState extends State<MyDrawer> {
 
           // home tile
           ListTile(
-            title: const Text('H O M E'),
+            title: Text(currentLanguage["home"] ?? "Home"),
             leading: Icon(Icons.home,
                 color: Theme.of(context).colorScheme.onSurface),
             onTap: () {
@@ -68,7 +72,7 @@ class _MyDrawerState extends State<MyDrawer> {
 
           // profile tile
           ListTile(
-            title: const Text('P R O F I L E'),
+            title: Text(currentLanguage["profile"] ?? "Profile"),
             leading: Icon(Icons.person,
                 color: Theme.of(context).colorScheme.onSurface),
             onTap: () {
@@ -82,7 +86,7 @@ class _MyDrawerState extends State<MyDrawer> {
 
           // users tile
           ListTile(
-            title: const Text('U S E R S'),
+            title: Text(currentLanguage["users"] ?? "Users"),
             leading: Icon(Icons.people,
                 color: Theme.of(context).colorScheme.onSurface),
             onTap: () {
@@ -96,7 +100,7 @@ class _MyDrawerState extends State<MyDrawer> {
 
           // logout tile
           ListTile(
-            title: const Text('L O G O U T'),
+            title: Text(currentLanguage["logout"] ?? "Logout"),
             leading: Icon(Icons.logout,
                 color: Theme.of(context).colorScheme.onSurface),
             onTap: () {

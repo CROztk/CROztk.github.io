@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:social/Theme/theme_notifier.dart';
 import 'package:social/components/my_appbar.dart';
 import 'package:social/components/my_elevated_button.dart';
 import 'package:social/components/my_textfield.dart';
@@ -19,6 +21,8 @@ class _MyLoginPageDesktopState extends State<MyLoginPageDesktop> {
 
   // login method
   void _login() async {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final currentLanguage = themeNotifier.currentLanguage;
     final String username = _emailController.text;
     final String password = _passwordController.text;
 
@@ -40,14 +44,16 @@ class _MyLoginPageDesktopState extends State<MyLoginPageDesktop> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: const Text("Error"),
-            content: const Text("Email or password cannot be empty"),
+            title: Text(currentLanguage["error"] ?? "Error"),
+            content: Text(
+                currentLanguage["email or password cannot be empty"] ??
+                    "Email or password cannot be empty"),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: const Text("OK"),
+                child: Text(currentLanguage["ok"] ?? "OK"),
               ),
             ],
           );
@@ -71,14 +77,20 @@ class _MyLoginPageDesktopState extends State<MyLoginPageDesktop> {
       // close dialog
       Navigator.of(context).pop();
       // show error dialog
-      showMessage(context, "Error", "Invalid email or password");
+      showMessage(
+          context,
+          currentLanguage["ok"] ?? "OK",
+          currentLanguage["invalid email or password"] ??
+              "Invalid email or password");
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final currentLanguage = themeNotifier.currentLanguage;
     return Scaffold(
-      appBar: MyAppbar(title: "s o C I a l"),
+      appBar: MyAppbar(title: currentLanguage["title"] ?? "s o C I a l"),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -98,17 +110,17 @@ class _MyLoginPageDesktopState extends State<MyLoginPageDesktop> {
                     ),
                     SizedBox(height: 40), // Increased spacing
                     MyTextfield(
-                        text: "Email",
+                        text: currentLanguage["email"] ?? "Email",
                         obscureText: false,
                         controller: _emailController),
                     SizedBox(height: 20),
                     MyTextfield(
-                        text: "Password",
+                        text: currentLanguage["password"] ?? "Password",
                         obscureText: true,
                         controller: _passwordController),
                     SizedBox(height: 30), // Increased spacing
                     MyElevatedButton(
-                        text: "Login",
+                        text: currentLanguage["login"] ?? "Login",
                         onPressed: () {
                           _login();
                         }),
@@ -116,11 +128,13 @@ class _MyLoginPageDesktopState extends State<MyLoginPageDesktop> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("Don't have an account?"),
+                        Text(currentLanguage["don't have an account?"] ??
+                            "Don't have an account?"),
                         GestureDetector(
                           onTap: widget.onTap,
-                          child: const Text(
-                            " Let's register!",
+                          child: Text(
+                            currentLanguage["let's register!"] ??
+                                " Let's register!",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),

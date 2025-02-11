@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:social/Theme/theme_notifier.dart';
 import 'package:social/components/my_appbar.dart';
 
 class MyUsersPageDesktop extends StatelessWidget {
@@ -7,8 +9,10 @@ class MyUsersPageDesktop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final currentLanguage = themeNotifier.currentLanguage;
     return Scaffold(
-      appBar: MyAppbar(title: "s o C I a l"),
+      appBar: MyAppbar(title: currentLanguage["title"] ?? "s o C I a l"),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection("users").snapshots(),
         builder: (context, snapshot) {
@@ -22,7 +26,10 @@ class MyUsersPageDesktop extends StatelessWidget {
               child: Column(
                 children: [
                   const Icon(Icons.people_alt, size: 120),
-                  Text("Something went wrong"),
+                  Text(
+                      currentLanguage["something went wrong"] ??
+                          "Something went wrong",
+                      style: TextStyle(fontSize: 30)),
                 ],
               ),
             );
@@ -68,7 +75,8 @@ class MyUsersPageDesktop extends StatelessWidget {
             child: Column(
               children: [
                 const Icon(Icons.person, size: 120),
-                Text("No users found", style: TextStyle(fontSize: 30)),
+                Text(currentLanguage["no users found"] ?? "No Users Found",
+                    style: TextStyle(fontSize: 30)),
               ],
             ),
           );

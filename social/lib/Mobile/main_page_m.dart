@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:social/Theme/theme_notifier.dart';
 import 'package:social/components/my_appbar.dart';
 import 'package:social/components/my_drawer.dart';
 import 'package:social/components/my_photo_post.dart';
@@ -98,8 +100,10 @@ class _MyMainPageMobileState extends State<MyMainPageMobile> {
 
   @override
   Widget build(BuildContext context) {
+    final themeNotifier = Provider.of<ThemeNotifier>(context);
+    final currentLanguage = themeNotifier.currentLanguage;
     return Scaffold(
-      appBar: MyAppbar(title: "s o C I a l"),
+      appBar: MyAppbar(title: currentLanguage["title"] ?? "s o C I a l"),
       drawer: MyDrawer(),
       body: Center(
         child: Stack(
@@ -116,7 +120,8 @@ class _MyMainPageMobileState extends State<MyMainPageMobile> {
                       controller: postController,
                       style: const TextStyle(fontSize: 20),
                       decoration: InputDecoration(
-                        hintText: "What's on your mind?",
+                        hintText: currentLanguage["what's on your mind?"] ??
+                            "What's on your mind?",
                         hintStyle: const TextStyle(fontSize: 24),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30)),
@@ -161,7 +166,8 @@ class _MyMainPageMobileState extends State<MyMainPageMobile> {
                       child: Column(
                         children: [
                           const Icon(Icons.error, size: 80),
-                          Text("Something went wrong"),
+                          Text(currentLanguage["something went wrong"] ??
+                              "Something went wrong"),
                         ],
                       ),
                     );
@@ -189,7 +195,8 @@ class _MyMainPageMobileState extends State<MyMainPageMobile> {
                     child: Column(
                       children: [
                         const Icon(Icons.error, size: 80),
-                        Text("No posts found"),
+                        Text(currentLanguage["no posts found"] ??
+                            "No posts found"),
                       ],
                     ),
                   );
@@ -214,7 +221,7 @@ class _MyMainPageMobileState extends State<MyMainPageMobile> {
                           left: Radius.circular(30),
                         ),
                       ),
-                      child: Text("Text Posts",
+                      child: Text(currentLanguage["text posts"] ?? "Text Posts",
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.white)),
                     ),
@@ -230,7 +237,8 @@ class _MyMainPageMobileState extends State<MyMainPageMobile> {
                           borderRadius: BorderRadius.horizontal(
                             right: Radius.circular(30),
                           )),
-                      child: Text("Image Posts",
+                      child: Text(
+                          currentLanguage["image posts"] ?? "Image Posts",
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.white)),
                     ),
